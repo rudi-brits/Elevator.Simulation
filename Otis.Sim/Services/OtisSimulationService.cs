@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-using Otis.Sim.Configuration.Models;
 using Otis.Sim.Configuration.Services;
 using Otis.Sim.Elevator.Services;
 using Otis.Sim.MappingProfiles;
@@ -9,50 +8,103 @@ namespace Otis.Sim.Services
 {
     public class OtisSimulationService
     {
+        const string successPrefix = "Success - ";
+
         public OtisSimulationService()
         {
-            // TODO: Add error handling for all parts here
             RunSimulation();
         }
 
         private void RunSimulation()
         {
-            var serviceProvider = SetupServiceCollection();
+            try
+            {
+                var serviceProvider = SetupServiceCollection();
 
-            LoadConfiguration(serviceProvider);
-            RunElevatorControllerService(serviceProvider);
+                LoadAppConfiguration(serviceProvider);
+                LoadElevatorControllerConfiguration(serviceProvider);
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Application startup failed: {exc.Message}");
+                
+                if (!string.IsNullOrWhiteSpace(exc.InnerException?.Message))
+                {                    
+                    Console.WriteLine(exc.InnerException.Message);
+                }
+            }
         }
 
         private ServiceProvider SetupServiceCollection()
         {
-            var serviceCollection = new ServiceCollection();
-
-            var configuration = new MapperConfiguration(config =>
+            try
             {
-                config.AddProfile<OtisMappingProfile>();
-            });
+                var serviceCollection = new ServiceCollection();
 
-            IMapper mapper = configuration.CreateMapper();
+                var configuration = new MapperConfiguration(config =>
+                {
+                    config.AddProfile<OtisMappingProfile>();
+                });
 
-            serviceCollection.AddSingleton(mapper);
-            serviceCollection.AddSingleton<OtisConfigurationService>();
-            serviceCollection.AddSingleton<ElevatorControllerService>();
+                IMapper mapper = configuration.CreateMapper();
 
-            var serviceProvider = serviceCollection.BuildServiceProvider();
+                serviceCollection.AddSingleton(mapper);
+                serviceCollection.AddSingleton<OtisConfigurationService>();
+                serviceCollection.AddSingleton<ElevatorControllerService>();
 
-            return serviceProvider;
+                var serviceProvider = serviceCollection.BuildServiceProvider();
+
+                Console.WriteLine(SetupServiceCollectionMessage());
+
+                return serviceProvider;
+            }
+            catch (Exception exc)
+            {
+                throw new Exception(SetupServiceCollectionMessage(false), exc);
+            }
         }
 
-        private void LoadConfiguration(ServiceProvider serviceProvider)
+        private void LoadAppConfiguration(ServiceProvider serviceProvider)
         {
-            var otisConfigurationService = serviceProvider.GetService<OtisConfigurationService>();
-            otisConfigurationService.LoadConfiguration();
+            try
+            {
+                var otisConfigurationService = serviceProvider.GetService<OtisConfigurationService>();
+                otisConfigurationService.LoadConfiguration();
+
+                Console.WriteLine(LoadAppConfigurationMessage());
+            }
+            catch (Exception exc)
+            {
+                throw new Exception(LoadAppConfigurationMessage(false), exc);
+            }
         }
 
-        private void RunElevatorControllerService(ServiceProvider serviceProvider)
+        private void LoadElevatorControllerConfiguration(ServiceProvider serviceProvider)
         {
-            var elevatorControllerService = serviceProvider.GetService<ElevatorControllerService>();
-            elevatorControllerService.LoadConfiguration();
+            try
+            {
+                var elevatorControllerService = serviceProvider.GetService<ElevatorControllerService>();
+                elevatorControllerService.LoadConfiguration();
+
+                Console.WriteLine(LoadElevatorControllerConfigurationMessage());
+            }
+            catch (Exception exc)
+            {
+                throw new Exception(LoadElevatorControllerConfigurationMessage(false), exc);
+            }
         }
+
+        private string SetupServiceCollectionMessage(bool isSuccess = true)
+            => $"{GetPrefix(isSuccess)}setup services and service provider";
+
+        private string LoadAppConfigurationMessage(bool isSuccess = true)
+            => $"{GetPrefix(isSuccess)} load app configuration from appsettings";
+
+        private string LoadElevatorControllerConfigurationMessage(bool isSuccess = true)
+            => $"{GetPrefix(isSuccess)} load elevator configuration";
+
+        private string GetPrefix(bool isSuccess = true)
+            => isSuccess ? successPrefix : "";
     }
 }

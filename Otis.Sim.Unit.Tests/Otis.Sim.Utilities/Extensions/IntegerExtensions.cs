@@ -16,7 +16,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = 9;
             int minValue = 7;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue);
+            bool result = maxValue.LargerThanByDifference(minValue);
             Assert.IsTrue(result);
         }
 
@@ -27,7 +27,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = 12;
             int minValue = 7;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue, maxValue - minValue - 1);
+            bool result = maxValue.LargerThanByDifference(minValue, maxValue - minValue - 1);
             Assert.IsTrue(result);
         }
 
@@ -38,7 +38,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = 1;
             int minValue = -1;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue);
+            bool result = maxValue.LargerThanByDifference(minValue);
             Assert.IsTrue(result);
         }
 
@@ -49,7 +49,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = -1;
             int minValue = -2;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue);
+            bool result = maxValue.LargerThanByDifference(minValue);
             Assert.IsTrue(result);
         }
 
@@ -60,7 +60,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = -1;
             int minValue = -8;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue, maxValue - minValue - 1);
+            bool result = maxValue.LargerThanByDifference(minValue, maxValue - minValue - 1);
             Assert.IsTrue(result);
         }
 
@@ -116,7 +116,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = 8;
             int minValue = 8;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue);
+            bool result = maxValue.LargerThanByDifference(minValue);
             Assert.IsFalse(result);
         }
 
@@ -127,7 +127,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = 12;
             int minValue = 7;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue, maxValue - minValue);
+            bool result = maxValue.LargerThanByDifference(minValue, maxValue - minValue);
             Assert.IsFalse(result);
         }
 
@@ -138,7 +138,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = -1;
             int minValue = -1;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue);
+            bool result = maxValue.LargerThanByDifference(minValue);
             Assert.IsFalse(result);
         }
 
@@ -149,7 +149,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions
             int maxValue = -1;
             int minValue = -8;
 
-            bool result = maxValue.LargerThanMinimumDifference(minValue, maxValue - minValue);
+            bool result = maxValue.LargerThanByDifference(minValue, maxValue - minValue);
             Assert.IsFalse(result);
         }
     }

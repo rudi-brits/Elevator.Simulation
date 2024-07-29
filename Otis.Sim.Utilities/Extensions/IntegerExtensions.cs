@@ -2,8 +2,8 @@
 {
     public static class IntegerExtensions
     {
-        public static bool LargerThanMinimumDifference(this int maxValue, int minValue, int minimumDifference = 0) =>
-           maxValue - minValue > minimumDifference;
+        public static bool LargerThanByDifference(this int maxValue, int minValue, int difference = 0) =>
+           maxValue - minValue > difference;
 
         public static int ApplyHigherValue(this int value, int higherValue) =>
             value < higherValue ? higherValue : value;
@@ -13,7 +13,7 @@
             if (!value.HasValue)
                 return higherValue;
 
-            return value.ApplyHigherValue(higherValue);
+            return value.Value.ApplyHigherValue(higherValue);
         }
 
         public static int ApplyLowerValue(this int value, int lowerValue) =>
@@ -24,7 +24,7 @@
             if (!value.HasValue)
                 return lowerValue;
 
-            return value.ApplyLowerValue(lowerValue);
+            return value.Value.ApplyLowerValue(lowerValue);
         }
 
         public static bool IsInRange(int value, int minValue, int maxValue) =>
@@ -35,7 +35,7 @@
             if (!value.HasValue)
                 return false;
 
-            return IsInRange(value, minValue, maxValue);
+            return IsInRange(value.Value, minValue, maxValue);
         }
     }
 }

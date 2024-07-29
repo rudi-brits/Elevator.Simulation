@@ -6,7 +6,7 @@ namespace Elevator.Simulation
     {
         static void Main(string[] args)
         {
-            var otisSimulationService = new OtisSimulationService();
+            _ = new OtisSimulationService();
         }
     }
 }

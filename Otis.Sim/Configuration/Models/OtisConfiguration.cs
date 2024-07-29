@@ -2,7 +2,7 @@
 {
     public class OtisConfiguration
     {
-        public OtisBuildingConfiguration BuildingConfiguration { get; set; }
-        public List<OtisElevatorConfiguration> ElevatorsConfiguration { get; set; }
+        public BuildingConfiguration? BuildingConfiguration { get; set; }
+        public List<ElevatorConfiguration>? ElevatorsConfiguration { get; set; }
     }
 }

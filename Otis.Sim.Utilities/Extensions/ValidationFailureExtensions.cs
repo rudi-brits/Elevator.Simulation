@@ -4,9 +4,9 @@ namespace Otis.Sim.Utilities.Extensions
 {
     public static class ValidationFailureExtensions
     {
-        public static string ToString(this List<ValidationFailure> failures)
+        public static string ToNewLineString(this List<ValidationFailure> failures)
         {
-            if (failures.Any())
+            if (!failures.Any())
             {
                 return string.Empty;
             }
@@ -14,3 +14,4 @@ namespace Otis.Sim.Utilities.Extensions
             return string.Join("\n", failures.Select(e => e.ErrorMessage));
         }
     }
+}

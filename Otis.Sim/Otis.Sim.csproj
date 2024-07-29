@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Elevator\Models\" />
     <Folder Include="Elevator\Validators\" />
   </ItemGroup>
 
