@@ -27,10 +27,10 @@
             return value.Value.ApplyLowerValue(lowerValue);
         }
 
-        public static bool IsInRange(int value, int minValue, int maxValue) =>
+        public static bool IsInRange(this int value, int minValue, int maxValue) =>
             value >= minValue && value <= maxValue;
 
-        public static bool IsInRange(int? value, int minValue, int maxValue)
+        public static bool IsInRange(this int? value, int minValue, int maxValue)
         {
             if (!value.HasValue)
                 return false;

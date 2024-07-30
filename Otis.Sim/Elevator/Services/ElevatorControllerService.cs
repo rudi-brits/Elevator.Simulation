@@ -1,65 +1,68 @@
-﻿using Otis.Sim.Configuration.Services;
+﻿using AutoMapper;
+using Otis.Sim.Configuration.Services;
 using Otis.Sim.Elevator.Models;
-using Otis.Sim.Utilities.Extensions;
+using Otis.Sim.Elevator.Validators;
+using Otis.Sim.Utilities.Helpers;
 
 namespace Otis.Sim.Elevator.Services
 {
-    public class ElevatorControllerService
+    public class ElevatorControllerService : ElevatorConfigurationService
     {
-        private List<ElevatorModel> _elevators;
+        private List<string> _elevatorTableHeaders;
+        public List<string> ElevatorTableHeaders => _elevatorTableHeaders;
+        public List<ElevatorDataRow> ElevatorDataRows => _mapper.Map<List<ElevatorDataRow>>(_elevators);
+        public string StatusFieldName => nameof(ElevatorDataRow.Status);
 
         private readonly object _lockRequestQueue;
         private HashSet<Guid> _completedRequestIds;
 
-        private OtisConfigurationService _configurationService;
+        private readonly IMapper _mapper;
 
-        public ElevatorControllerService(OtisConfigurationService configurationService)
+        public ElevatorControllerService(OtisConfigurationService configurationService,
+            IMapper mapper): base(configurationService)
+        {   
+            _mapper = mapper;
+            _elevatorTableHeaders = ReflectionHelper.GetFormattedPropertyNames<ElevatorDataRow>();
+        }
+        
+        public ElevatorRequestResult RequestElevator(UserInputRequest userInputRequest)
         {
-            _configurationService = configurationService;
+            var userInputValidationResult = ValidateUserInputRequest(userInputRequest);
+            if (userInputValidationResult != null)
+                return userInputValidationResult;
 
-            _elevators = new List<ElevatorModel>();
+            var elevatorRequest = new ElevatorRequest(userInputRequest);
+
+            var elevatorRequestValidationResult = ValidateElevatorRequest(elevatorRequest);
+            if (elevatorRequestValidationResult != null)
+                return elevatorRequestValidationResult;
+
+            return new ElevatorRequestResult(true);
         }
 
-        public void LoadConfiguration()
+        private ElevatorRequestResult? ValidateUserInputRequest(UserInputRequest userInputRequest)
         {
-            var elevatorId = 0;
-            var buildingConfiguration = _configurationService.BuildingConfiguration!;
+            var validationResult = new UserInputRequestValidator()
+                .Validate(userInputRequest);
 
-            _configurationService.ElevatorsConfiguration!.ForEach(elevatorConfiguration =>
-            {
-                _elevators.Add(new ElevatorModel
-                {
-                    Id              = ++elevatorId,
-                    Description     = elevatorConfiguration.Description.Trim(),
-                    LowestFloor     = elevatorConfiguration.LowestFloor.ApplyHigherValue(buildingConfiguration.LowestFloor),
-                    HighestFloor    = elevatorConfiguration.HighestFloor.ApplyLowerValue(buildingConfiguration.HighestFloor),
-                    MaximumLoad     = buildingConfiguration.MaximumElevatorLoad,
-                    CompleteRequest = CompleteRequest
-                });
-            });
+            if (!validationResult.IsValid)
+                return new ElevatorRequestResult(validationResult.Errors);
 
-            PrintLoadedConfiguration();
+            return null;
         }
 
-        private void PrintLoadedConfiguration()
+        private ElevatorRequestResult? ValidateElevatorRequest(ElevatorRequest elevatorRequest)
         {
-            Console.WriteLine();
+            var validationResult = new ElevatorRequestValidator(_elevatorRequestValidationValues)
+                .Validate(elevatorRequest);
 
-            Console.WriteLine(
-                "NOTE: Elevator configuration may be overridden by building configuration where values exceed the bounds of the building");
-            Console.WriteLine();
+            if (!validationResult.IsValid)
+                return new ElevatorRequestResult(validationResult.Errors);
 
-            Console.WriteLine("Building configuration:");
-            Console.WriteLine(_configurationService.BuildingConfiguration!.ToString());
-            Console.WriteLine();
-
-            Console.WriteLine("Elevators configuration:");
-            _elevators.ForEach(elevator => Console.WriteLine(elevator.ToString()));
-
-            Console.WriteLine();
+            return null;
         }
 
-        public void CompleteRequest(Guid requestId)
+        public override void CompleteRequest(Guid requestId)
         {
             lock (_lockRequestQueue)
             {

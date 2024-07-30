@@ -1,15 +1,21 @@
-﻿namespace Otis.Sim.Elevator.Models
+﻿using Otis.Sim.Configuration.Models;
+using static Otis.Sim.Elevator.Enums.ElevatorEnum;
+
+namespace Otis.Sim.Elevator.Models
 {
-    public class ElevatorModel
+    public class ElevatorModel : ElevatorConfigurationBase
     {
         public int Id { get; set; }
-        public string Description { get; set; } = string.Empty;
-        public int LowestFloor { get; set; }
-        public int HighestFloor { get; set; }
+        public new int LowestFloor { get; set; }
+        public new int HighestFloor { get; set; }
         public int CurrentFloor { get; set; } = 0;
         public int? NextFloor { get; set; }
         public int CurrentLoad { get; set; } = 0;
         public int MaximumLoad { get; set; }
+        public int Capacity => MaximumLoad - CurrentLoad;
+
+        private ElevatorStatus _currentStatus { get; set; } = ElevatorStatus.Idle;
+        public ElevatorStatus CurrentStatus => _currentStatus;
 
         public delegate void CompleteRequestDelegate(Guid requestId);
         public CompleteRequestDelegate CompleteRequest;

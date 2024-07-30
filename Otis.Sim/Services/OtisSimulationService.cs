@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Otis.Sim.Configuration.Services;
 using Otis.Sim.Elevator.Services;
+using Otis.Sim.Interface.Services;
 using Otis.Sim.MappingProfiles;
 
 namespace Otis.Sim.Services
@@ -17,12 +18,17 @@ namespace Otis.Sim.Services
 
         private void RunSimulation()
         {
+            var initilaisedSuccess = false;
+            ServiceProvider serviceProvider = null;
+
             try
             {
-                var serviceProvider = SetupServiceCollection();
+                serviceProvider = SetupServiceCollection();
 
                 LoadAppConfiguration(serviceProvider);
                 LoadElevatorControllerConfiguration(serviceProvider);
+
+                initilaisedSuccess = true;
             }
             catch (Exception exc)
             {
@@ -30,9 +36,16 @@ namespace Otis.Sim.Services
                 Console.WriteLine($"Application startup failed: {exc.Message}");
                 
                 if (!string.IsNullOrWhiteSpace(exc.InnerException?.Message))
-                {                    
+                { 
                     Console.WriteLine(exc.InnerException.Message);
                 }
+            }
+
+            DisplayUserInputMessage($"Press any key to {(initilaisedSuccess ? "continue" : "exit")}...");
+
+            if (initilaisedSuccess)
+            {
+                InitialiseTerminalUi(serviceProvider!);
             }
         }
 
@@ -52,6 +65,7 @@ namespace Otis.Sim.Services
                 serviceCollection.AddSingleton(mapper);
                 serviceCollection.AddSingleton<OtisConfigurationService>();
                 serviceCollection.AddSingleton<ElevatorControllerService>();
+                serviceCollection.AddSingleton<TerminalUiService>();
 
                 var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -95,6 +109,19 @@ namespace Otis.Sim.Services
             }
         }
 
+        private void InitialiseTerminalUi(ServiceProvider serviceProvider)
+        {
+            try
+            { 
+                var terminalUiService = serviceProvider.GetService<TerminalUiService>();
+                terminalUiService.InitialiseUi();
+            }
+            catch (Exception exc)
+            {
+                DisplayUserInputMessage($"UI initialisation failed. Press any key to exit - {exc.Message}");
+            }
+        }
+
         private string SetupServiceCollectionMessage(bool isSuccess = true)
             => $"{GetPrefix(isSuccess)}setup services and service provider";
 
@@ -106,5 +133,11 @@ namespace Otis.Sim.Services
 
         private string GetPrefix(bool isSuccess = true)
             => isSuccess ? successPrefix : "";
+
+        private void DisplayUserInputMessage(string message)
+        {
+            Console.WriteLine(message);
+            Console.ReadKey();
+        }
     }
 }
