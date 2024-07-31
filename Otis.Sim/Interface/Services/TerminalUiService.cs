@@ -22,6 +22,7 @@ namespace Otis.Sim.Interface.Services
         public TerminalUiService(ElevatorControllerService elevatorControllerService)
         {
             _elevatorControllerService = elevatorControllerService;
+            _elevatorControllerService.UpdateRequestStatus = UpdateRequestStatus;
         }
 
         public void InitialiseUi()
@@ -286,6 +287,17 @@ namespace Otis.Sim.Interface.Services
                 }
             });
             refreshDataThread.Start();
+        }
+
+        public void UpdateRequestStatus(string message)
+        {
+            Application.MainLoop.Invoke(() =>
+            {
+                if (_requestStatusView != null)
+                {
+                    _requestStatusView.Text = $"{message}\n{_requestStatusView.Text}";
+                }
+            });
         }
     }
 }
