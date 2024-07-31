@@ -4,12 +4,8 @@ using UiConstants = Otis.Sim.Interface.Constants.TerminalUiConstants;
 
 namespace Otis.Sim.Elevator.Models
 {
-    public class ElevatorRequest
+    public class ElevatorRequest : ElevatorRequestBase
     {
-        public Guid Id { get; set; }
-        public int OriginFloor { get; set; }
-        public int DestinationFloor { get; set; }
-        public int Capacity { get; set; }
         public int? ElevatorId { get; set; }
         public RequestStatus RequestStatus
         {

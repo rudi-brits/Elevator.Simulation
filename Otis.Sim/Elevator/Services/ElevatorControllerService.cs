@@ -25,10 +25,8 @@ namespace Otis.Sim.Elevator.Services
         public delegate void UpdateRequestStatusDelegate(string message);
         public UpdateRequestStatusDelegate UpdateRequestStatus;
 
-        private readonly IMapper _mapper;
-
         public ElevatorControllerService(OtisConfigurationService configurationService,
-            IMapper mapper): base(configurationService)
+            IMapper mapper): base(configurationService, mapper)
         {   
             _mapper = mapper;
 
@@ -129,14 +127,11 @@ namespace Otis.Sim.Elevator.Services
                             {
                                 if (request.RequestStatus == RequestStatus.Pending)
                                 {
-                                    //var elevator = AssignElevator(request);
-                                    //if (elevator != null)
-                                    //{
-                                    //    request.ElevatorId = elevator.Id;
-
-                                    //    //UpdateQueueStatus.Invoke($"Request Id: {request.Id} " +
-                                    //    //    $"assigned to {elevator.Description}");
-                                    //}
+                                    var elevatorId = RequestElevator(request);
+                                    if (elevatorId != null)
+                                    {
+                                        request.ElevatorId = elevatorId;
+                                    }
                                 }
 
                                 _requestQueue.Enqueue(request);
@@ -153,18 +148,34 @@ namespace Otis.Sim.Elevator.Services
             }
         }
 
-        private void PrintRequestStatus(string message)
+        private int? RequestElevator(ElevatorRequest request)
         {
-            UpdateRequestStatus?.Invoke($"{DateTime.Now} - {message}");
+            var elevator = _elevators
+                .Where
+                (
+                    elevator => elevator.CanAcceptRequest(request)
+                )
+                .OrderBy(elevator => Math.Abs(elevator.CurrentFloor - request.OriginFloor))
+                .FirstOrDefault();
+
+            if (elevator != null && elevator.AcceptRequest(request))
+                return elevator.Id;
+
+            return null;
         }
 
-        public override void CompleteRequest(Guid requestId)
+        protected override void CompleteRequest(Guid requestId)
         {
             lock (_lockRequestQueue)
             {
                 if (!_completedRequestIds.Any(id => id == requestId))
                     _completedRequestIds.Add(requestId);
             }
+        }
+
+        protected override void PrintRequestStatus(string message)
+        {
+            UpdateRequestStatus?.Invoke($"{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff")} - {message}");
         }
     }
 }

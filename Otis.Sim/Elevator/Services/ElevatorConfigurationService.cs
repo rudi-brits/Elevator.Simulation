@@ -1,4 +1,5 @@
-﻿using Otis.Sim.Configuration.Services;
+﻿using AutoMapper;
+using Otis.Sim.Configuration.Services;
 using Otis.Sim.Elevator.Models;
 using Otis.Sim.Utilities.Extensions;
 
@@ -10,10 +11,13 @@ namespace Otis.Sim.Elevator.Services
         protected ElevatorRequestValidationValues _elevatorRequestValidationValues;
 
         protected OtisConfigurationService _configurationService;
+        protected IMapper _mapper;
 
-        protected ElevatorConfigurationService(OtisConfigurationService configurationService)
+        protected ElevatorConfigurationService(OtisConfigurationService configurationService,
+            IMapper mapper)
         {
             _configurationService = configurationService;
+            _mapper = mapper;
         }
 
         public void LoadConfiguration()
@@ -23,14 +27,15 @@ namespace Otis.Sim.Elevator.Services
 
             _configurationService.ElevatorsConfiguration!.ForEach(elevatorConfiguration =>
             {
-                _elevators.Add(new ElevatorModel
+                _elevators.Add(new ElevatorModel(_mapper)
                 {
-                    Id              = ++elevatorId,
-                    Description     = elevatorConfiguration.Description.Trim(),
-                    LowestFloor     = elevatorConfiguration.LowestFloor.ApplyHigherValue(buildingConfiguration.LowestFloor),
-                    HighestFloor    = elevatorConfiguration.HighestFloor.ApplyLowerValue(buildingConfiguration.HighestFloor),
-                    MaximumLoad     = buildingConfiguration.MaximumElevatorLoad,
-                    CompleteRequest = CompleteRequest
+                    Id                 = ++elevatorId,
+                    Description        = elevatorConfiguration.Description.Trim(),
+                    LowestFloor        = elevatorConfiguration.LowestFloor.ApplyHigherValue(buildingConfiguration.LowestFloor),
+                    HighestFloor       = elevatorConfiguration.HighestFloor.ApplyLowerValue(buildingConfiguration.HighestFloor),
+                    MaximumLoad        = buildingConfiguration.MaximumElevatorLoad,
+                    CompleteRequest    = CompleteRequest,
+                    PrintRequestStatus = PrintRequestStatus
                 });
             });
 
@@ -44,7 +49,8 @@ namespace Otis.Sim.Elevator.Services
             PrintLoadedConfiguration();
         }
 
-        public abstract void CompleteRequest(Guid requestId);
+        protected abstract void CompleteRequest(Guid requestId);
+        protected abstract void PrintRequestStatus(string message);
 
         private void PrintLoadedConfiguration()
         {
