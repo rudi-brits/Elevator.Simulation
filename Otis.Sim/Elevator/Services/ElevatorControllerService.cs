@@ -173,6 +173,18 @@ namespace Otis.Sim.Elevator.Services
             }
         }
 
+        protected override void RequeueRequest(Guid requestId)
+        {
+            lock (_lockRequestQueue)
+            {
+                var request = _requestQueue
+                    .FirstOrDefault(request => request.Id == requestId);
+
+                if (request != null)
+                    request.ElevatorId = null;
+            }
+        }
+
         protected override void PrintRequestStatus(string message)
         {
             UpdateRequestStatus?.Invoke($"{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff")} - {message}");

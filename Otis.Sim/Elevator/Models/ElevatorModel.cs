@@ -18,12 +18,20 @@ namespace Otis.Sim.Elevator.Models
                 if (_primaryDirectionQueue.Any())
                 {
                     isPrimaryDirection = true;
-                    return _primaryDirectionQueue.First();
+
+                    if (_currentStatus == ElevatorStatus.MovingUp)
+                        return _primaryDirectionQueue.First();
+
+                    return _primaryDirectionQueue.OrderByDescending(x => x).First();
                 }
                 if (_secondaryDirectionQueue.Any())
                 {
                     isPrimaryDirection = false;
-                    return _secondaryDirectionQueue.First();
+
+                    if (_currentStatus == ElevatorStatus.MovingUp)
+                        return _secondaryDirectionQueue.First();
+
+                    return _secondaryDirectionQueue.OrderByDescending(x => x).First();
                 }
 
                 return null;
@@ -59,7 +67,7 @@ namespace Otis.Sim.Elevator.Models
 
         private List<ElevatorAcceptedRequest> _acceptedRequests = new List<ElevatorAcceptedRequest>();
 
-        public int FloorMoveTime { get; set; } = 2000;
+        public int FloorMoveTime { get; set; } = 6000;
         public int DoorsOpenTime { get; set; } = 2500;
 
         private Timer _floorMoveTimer;
@@ -67,6 +75,9 @@ namespace Otis.Sim.Elevator.Models
 
         public delegate void CompleteRequestDelegate(Guid requestId);
         public CompleteRequestDelegate CompleteRequest;
+
+        public delegate void RequeueRequestDelegate(Guid requestId);
+        public RequeueRequestDelegate RequeueRequest;
 
         public delegate void PrintRequestStatusDelegate(string message);
         public PrintRequestStatusDelegate PrintRequestStatus;
@@ -122,8 +133,8 @@ namespace Otis.Sim.Elevator.Models
             {
                 if (CurrentStatus == ElevatorStatus.Idle)
                 {
-                    var primaryDirectionDown = CurrentFloor > request.OriginFloor && request.DestinationFloor < CurrentFloor;
-                    var primaryDirectionUp = CurrentFloor < request.OriginFloor && request.DestinationFloor > request.OriginFloor;
+                    var primaryDirectionDown = CurrentFloor > request.OriginFloor && request.Direction == ElevatorDirection.Down;
+                    var primaryDirectionUp   = CurrentFloor < request.OriginFloor && request.Direction == ElevatorDirection.Up;
 
                     _primaryDirectionQueue.Add(request.OriginFloor);
 
@@ -140,8 +151,9 @@ namespace Otis.Sim.Elevator.Models
                     targetQueue.Add(request.DestinationFloor);
                 }
 
-                // Map here
                 var acceptedRequest = _mapper.Map<ElevatorAcceptedRequest>(request);
+                acceptedRequest.ElevatorName = Description;
+
                 _acceptedRequests.Add(acceptedRequest);
 
                 PrintRequestStatus(acceptedRequest.ToAcceptedRequestString());
@@ -156,12 +168,115 @@ namespace Otis.Sim.Elevator.Models
 
         private void MoveElevator(object? state)
         {
+            var nextFloor = NextFloor;
+            if (nextFloor == null)
+                return;
 
+            if (nextFloor > CurrentFloor)
+            {
+                _currentStatus = ElevatorStatus.MovingUp;
+                CurrentFloor++;
+            }
+            else if (nextFloor < CurrentFloor)
+            {
+                _currentStatus = ElevatorStatus.MovingDown;
+                CurrentFloor--;
+            }
+            else if (CurrentFloor == nextFloor)
+            {
+                if (isPrimaryDirection)
+                    _primaryDirectionQueue.Remove((int)nextFloor);
+                else
+                    _secondaryDirectionQueue.Remove((int)nextFloor);
+
+                _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
+                OpenDoors();
+            }
         }
+
+        private void OpenDoors()
+        
+        {
+            _currentStatus = ElevatorStatus.DoorsOpen;
+            _doorsOpenTimer.Change(DoorsOpenTime, Timeout.Infinite);
+
+            var destinationRequest = _acceptedRequests
+                .Where(request => request.DestinationFloor == CurrentFloor)
+                .FirstOrDefault();
+
+            if (destinationRequest != null)
+            {
+                destinationRequest.DestinationFloorServiced = true;
+                CurrentLoad -= destinationRequest.NumberOfPeople;
+
+                HandleCompletedRequest(destinationRequest);
+            }
+
+            var originRequest = _acceptedRequests
+                .Where(request => request.OriginFloor == CurrentFloor)
+                .FirstOrDefault();
+
+            if (originRequest != null)
+            {
+                originRequest.OriginFloorServiced = true;
+
+                if (Capacity == 0)
+                {
+                    HandleRequeueRequest(originRequest);
+                    return;
+                }
+
+                if (Capacity < originRequest.NumberOfPeople)
+                    originRequest.NumberOfPeople = Capacity;
+
+                CurrentLoad += originRequest.NumberOfPeople;
+
+                HandleCompletedRequest(originRequest);
+            }
+        }        
 
         private void CloseDoors(object? state)
         {
+           _doorsOpenTimer.Change(Timeout.Infinite, Timeout.Infinite);
+           MoveToNextFloor();
+        }
 
+        private void MoveToNextFloor()
+        {
+            if (NextFloor == null)
+            {
+                _currentStatus = ElevatorStatus.Idle;
+                _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+            else
+                _floorMoveTimer.Change(0, FloorMoveTime);
+        }
+
+        private void HandleCompletedRequest(ElevatorAcceptedRequest request)
+        {
+            if (request.Completed)
+            {
+                RemoveAcceptedRequest(request.Id);
+
+                CompleteRequest.Invoke(request.Id);
+                PrintRequestStatus(request.ToCompletedRequestString());
+            }
+        }
+
+        private void HandleRequeueRequest(ElevatorAcceptedRequest request)
+        {
+            RemoveAcceptedRequest(request.Id);
+
+            RequeueRequest.Invoke(request.Id);
+            PrintRequestStatus(request.ToRequeuedRequestString());
+        }
+
+        private void RemoveAcceptedRequest(Guid id)
+        {
+            _acceptedRequests = _acceptedRequests
+               .Where(request => request.Id != id)
+               .ToList();
         }
     }
 }

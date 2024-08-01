@@ -36,7 +36,7 @@ namespace Otis.Sim.Elevator.Models
             Id               = Guid.NewGuid();
             OriginFloor      = (int)UStringHelper.ToInteger(userInputRequest.OriginFloorInput);
             DestinationFloor = (int)UStringHelper.ToInteger(userInputRequest.DestinationFloorInput);
-            Capacity         = (int)UStringHelper.ToInteger(userInputRequest.CapacityInput);
+            NumberOfPeople   = (int)UStringHelper.ToInteger(userInputRequest.CapacityInput);
         }
 
         public string ToDuplicateRequestString()
@@ -53,7 +53,7 @@ namespace Otis.Sim.Elevator.Models
                 $"{nameof(Id)}: {Id}, " +
                 $"{UiConstants.OriginFloorName}: {OriginFloor}, " + 
                 $"{UiConstants.DestinationFloorName}: {DestinationFloor}, " + 
-                $"{UiConstants.NumberOfPeopleName}: {Capacity}, " +
+                $"{UiConstants.NumberOfPeopleName}: {NumberOfPeople}, " +
                 $"Status: {RequestStatus}, " +
                 $"{nameof(Direction)}: {Direction}";
         }

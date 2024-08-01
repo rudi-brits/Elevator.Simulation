@@ -31,7 +31,7 @@ namespace Otis.Sim.Elevator.Validators
                         $"{validationValues.LowestFloor}",
                         $"{validationValues.HighestFloor}"));
 
-            RuleFor(model => model.Capacity)
+            RuleFor(model => model.NumberOfPeople)
                 .Must(value => value.IsInRange(1, validationValues.MaximumLoad))
                     .WithMessage(Messages.Services.BaseMessageService.FormatMessage(
                         MessageService.MustBeWithinRange,

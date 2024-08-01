@@ -268,6 +268,7 @@ namespace Otis.Sim.Interface.Services
                     dataRow.Id,
                     dataRow.Name,
                     dataRow.CurrentFloor,
+                    dataRow.NextFloor,
                     dataRow.CurrentLoad,
                     dataRow.Capacity,
                     dataRow.Status);

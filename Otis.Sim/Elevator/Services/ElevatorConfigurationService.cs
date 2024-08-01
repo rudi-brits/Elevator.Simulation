@@ -35,6 +35,7 @@ namespace Otis.Sim.Elevator.Services
                     HighestFloor       = elevatorConfiguration.HighestFloor.ApplyLowerValue(buildingConfiguration.HighestFloor),
                     MaximumLoad        = buildingConfiguration.MaximumElevatorLoad,
                     CompleteRequest    = CompleteRequest,
+                    RequeueRequest     = RequeueRequest,
                     PrintRequestStatus = PrintRequestStatus
                 });
             });
@@ -50,6 +51,7 @@ namespace Otis.Sim.Elevator.Services
         }
 
         protected abstract void CompleteRequest(Guid requestId);
+        protected abstract void RequeueRequest(Guid requestId);
         protected abstract void PrintRequestStatus(string message);
 
         private void PrintLoadedConfiguration()
