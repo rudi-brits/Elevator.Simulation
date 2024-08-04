@@ -14,6 +14,17 @@ namespace Otis.Sim.Elevator.Models
         public string ToAcceptedRequestString()
             => ToStatusString("Accepted");
 
+        public string ToPickedUpRequestString(int numberOfPeople, int capacity)
+            => _toEmbarkDisembarkString("Pick up", numberOfPeople, capacity);
+
+        public string ToDroppedOffRequestString(int numberOfPeople, int capacity)
+            => _toEmbarkDisembarkString("Drop off", numberOfPeople, capacity);
+
+        private string _toEmbarkDisembarkString(string description, int numberOfPeople, int capacity)
+            => $"{ToStatusString($"{ElevatorStatus.DoorsOpen} ({description})")}, " +
+               $"{UiConstants.PeopleName}: {numberOfPeople}, " +
+               $"Capacity: {capacity}, ";
+
         public string ToCompletedRequestString()
             => ToStatusString("Completed");
 
@@ -26,7 +37,7 @@ namespace Otis.Sim.Elevator.Models
                 $"{nameof(Id)}: {Id}, " +
                 $"{UiConstants.OriginFloorName}: {OriginFloor}, " +
                 $"{UiConstants.DestinationFloorName}: {DestinationFloor}, " +
-                $"{UiConstants.NumberOfPeopleName}: {NumberOfPeople}, " +
+                $"{UiConstants.PeopleName}: {NumberOfPeople}, " +
                 $"Status: {status}, " +
                 $"Direction: {RequestDirection}, " +
                 $"Elevator: {ElevatorName}";

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Otis.Sim.Configuration.Models;
 using Otis.Sim.Utilities.Extensions;
+using System.Diagnostics;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 
 namespace Otis.Sim.Elevator.Models
@@ -17,7 +18,7 @@ namespace Otis.Sim.Elevator.Models
             {
                 if (_primaryDirectionQueue.Any())
                 {
-                    isPrimaryDirection = true;
+                    _isPrimaryDirection = true;
 
                     if (_currentStatus == ElevatorStatus.MovingUp)
                         return _primaryDirectionQueue.First();
@@ -26,7 +27,7 @@ namespace Otis.Sim.Elevator.Models
                 }
                 if (_secondaryDirectionQueue.Any())
                 {
-                    isPrimaryDirection = false;
+                    _isPrimaryDirection = false;
 
                     if (_currentStatus == ElevatorStatus.MovingUp)
                         return _secondaryDirectionQueue.First();
@@ -61,13 +62,15 @@ namespace Otis.Sim.Elevator.Models
         private ElevatorStatus _currentStatus { get; set; } = ElevatorStatus.Idle;
         public ElevatorStatus CurrentStatus => _currentStatus;
 
-        private bool isPrimaryDirection { get; set; } = true;
+        private bool _isMoving = false;
+
+        private bool _isPrimaryDirection { get; set; } = true;
         private SortedSet<int> _primaryDirectionQueue = new SortedSet<int>();
         private SortedSet<int> _secondaryDirectionQueue = new SortedSet<int>();
 
         private List<ElevatorAcceptedRequest> _acceptedRequests = new List<ElevatorAcceptedRequest>();
 
-        public int FloorMoveTime { get; set; } = 6000;
+        public int FloorMoveTime { get; set; } = 5000;
         public int DoorsOpenTime { get; set; } = 2500;
 
         private Timer _floorMoveTimer;
@@ -105,9 +108,12 @@ namespace Otis.Sim.Elevator.Models
 
         private bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
         {
-            var lastFloor = isPrimaryDirection
-                ? _primaryDirectionQueue.LastOrDefault()
-                : _secondaryDirectionQueue.LastOrDefault();
+            var targetQueue = _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
+            var lastFloor = _currentStatus == ElevatorStatus.MovingUp
+                ? targetQueue.LastOrDefault()
+                : targetQueue.OrderByDescending(x => x).LastOrDefault();
+
+            Debug.WriteLine($"originFloor: {originFloor}, direction: {direction}, lastFloor: {lastFloor}");
 
             if (Capacity == 0)
                 return false;
@@ -140,13 +146,12 @@ namespace Otis.Sim.Elevator.Models
 
                     if (primaryDirectionDown || primaryDirectionUp)
                         _primaryDirectionQueue.Add(request.DestinationFloor);
-
                     else
                         _secondaryDirectionQueue.Add(request.DestinationFloor);
                 }
                 else
                 {
-                    var targetQueue = isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
+                    var targetQueue = _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
                     targetQueue.Add(request.OriginFloor);
                     targetQueue.Add(request.DestinationFloor);
                 }
@@ -155,10 +160,10 @@ namespace Otis.Sim.Elevator.Models
                 acceptedRequest.ElevatorName = Description;
 
                 _acceptedRequests.Add(acceptedRequest);
-
                 PrintRequestStatus(acceptedRequest.ToAcceptedRequestString());
 
-                _floorMoveTimer.Change(0, FloorMoveTime);
+                if (!_isMoving)
+                    MoveElevator();
 
                 return true;
             }
@@ -184,19 +189,17 @@ namespace Otis.Sim.Elevator.Models
             }
             else if (CurrentFloor == nextFloor)
             {
-                if (isPrimaryDirection)
+                if (_isPrimaryDirection)
                     _primaryDirectionQueue.Remove((int)nextFloor);
                 else
                     _secondaryDirectionQueue.Remove((int)nextFloor);
 
-                _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
-
+                StopElevator();
                 OpenDoors();
             }
         }
 
         private void OpenDoors()
-        
         {
             _currentStatus = ElevatorStatus.DoorsOpen;
             _doorsOpenTimer.Change(DoorsOpenTime, Timeout.Infinite);
@@ -210,6 +213,10 @@ namespace Otis.Sim.Elevator.Models
                 destinationRequest.DestinationFloorServiced = true;
                 CurrentLoad -= destinationRequest.NumberOfPeople;
 
+                var statusMessage = destinationRequest.ToDroppedOffRequestString(
+                    destinationRequest.NumberOfPeople, Capacity);
+
+                PrintRequestStatus(statusMessage);
                 HandleCompletedRequest(destinationRequest);
             }
 
@@ -232,6 +239,10 @@ namespace Otis.Sim.Elevator.Models
 
                 CurrentLoad += originRequest.NumberOfPeople;
 
+                //var statusMessage = originRequest.ToPickedUpRequestString(
+                //    originRequest.NumberOfPeople, Capacity);
+
+                //PrintRequestStatus(statusMessage);
                 HandleCompletedRequest(originRequest);
             }
         }        
@@ -247,10 +258,22 @@ namespace Otis.Sim.Elevator.Models
             if (NextFloor == null)
             {
                 _currentStatus = ElevatorStatus.Idle;
-                _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                StopElevator();
             }
             else
-                _floorMoveTimer.Change(0, FloorMoveTime);
+                MoveElevator();
+        }
+
+        private void MoveElevator()
+        {
+            _floorMoveTimer.Change(0, FloorMoveTime);
+            _isMoving = true;
+        }
+
+        private void StopElevator()
+        {
+            _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            _isMoving = false;
         }
 
         private void HandleCompletedRequest(ElevatorAcceptedRequest request)

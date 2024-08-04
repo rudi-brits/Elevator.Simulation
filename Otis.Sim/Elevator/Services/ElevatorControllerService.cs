@@ -3,6 +3,7 @@ using Otis.Sim.Configuration.Services;
 using Otis.Sim.Elevator.Models;
 using Otis.Sim.Elevator.Validators;
 using Otis.Sim.Utilities.Helpers;
+using System.Diagnostics;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 using MessageService = Otis.Sim.Messages.Services.ValidationMessageService;
 
@@ -157,6 +158,24 @@ namespace Otis.Sim.Elevator.Services
                 )
                 .OrderBy(elevator => Math.Abs(elevator.CurrentFloor - request.OriginFloor))
                 .FirstOrDefault();
+
+            _elevators
+                .Where(elevator => elevator.CanAcceptRequest(request))
+                .Select(elevator => new
+                {
+                    Elevator = elevator,
+                    Distance = Math.Abs(elevator.CurrentFloor - request.OriginFloor)
+                })
+                .OrderBy(result => result.Distance)
+                .ToList()
+                .ForEach(result =>
+                {
+                    Debug.WriteLine($"{result.Elevator.Description}, Status: {result.Elevator.CurrentStatus}, " +
+                        $"Capacity: {result.Elevator.Capacity}, CurrentFloor: {result.Elevator.CurrentFloor}, " +
+                        $"Request from: {request.OriginFloor}, Request to: {request.DestinationFloor}, " +
+                        $"Request direction: {request.Direction}, " + 
+                        $"Distance: {result.Distance}");
+                });
 
             if (elevator != null && elevator.AcceptRequest(request))
                 return elevator.Id;

@@ -102,6 +102,7 @@ namespace Otis.Sim.Interface.Services
                 Height = Dim.Fill(),
                 ReadOnly = true,
                 CanFocus = true,
+                WordWrap = true,
             };
             requestStatusFrameView.Add(_requestStatusView);
 
