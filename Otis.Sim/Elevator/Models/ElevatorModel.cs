@@ -16,28 +16,18 @@ namespace Otis.Sim.Elevator.Models
         {
             get
             {
-                if (_primaryDirectionQueue.Any())
-                {
-                    _isPrimaryDirection = true;
+                _isPrimaryDirection = _primaryDirectionQueue.Any();
 
-                    if (_currentStatus == ElevatorStatus.MovingUp)
-                        return _primaryDirectionQueue.First();
-
-                    return _primaryDirectionQueue.OrderByDescending(x => x).First();
-                }
-                if (_secondaryDirectionQueue.Any())
-                {
-                    _isPrimaryDirection = false;
-
-                    if (_currentStatus == ElevatorStatus.MovingUp)
-                        return _secondaryDirectionQueue.First();
-
-                    return _secondaryDirectionQueue.OrderByDescending(x => x).First();
-                }
-
-                return null;
+                return _currentStatus == ElevatorStatus.MovingDown
+                    ? _currentDirectionQueue.OrderByDescending(x => x).FirstOrDefault()
+                    : _currentDirectionQueue.FirstOrDefault();
             }
         }
+        public int? LastFloor 
+            => _currentStatus == ElevatorStatus.MovingDown
+                ? _currentDirectionQueue.OrderByDescending(x => x).LastOrDefault()
+                : _currentDirectionQueue.LastOrDefault();
+
         public int CurrentLoad { get; set; } = 0;
         public int MaximumLoad { get; set; }
         public int Capacity => MaximumLoad - CurrentLoad;
@@ -67,6 +57,8 @@ namespace Otis.Sim.Elevator.Models
         private bool _isPrimaryDirection { get; set; } = true;
         private SortedSet<int> _primaryDirectionQueue = new SortedSet<int>();
         private SortedSet<int> _secondaryDirectionQueue = new SortedSet<int>();
+        private SortedSet<int> _currentDirectionQueue
+            => _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
 
         private List<ElevatorAcceptedRequest> _acceptedRequests = new List<ElevatorAcceptedRequest>();
 
@@ -108,12 +100,7 @@ namespace Otis.Sim.Elevator.Models
 
         private bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
         {
-            var targetQueue = _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
-            var lastFloor = _currentStatus == ElevatorStatus.MovingUp
-                ? targetQueue.LastOrDefault()
-                : targetQueue.OrderByDescending(x => x).LastOrDefault();
-
-            Debug.WriteLine($"originFloor: {originFloor}, direction: {direction}, lastFloor: {lastFloor}");
+            Debug.WriteLine($"originFloor: {originFloor}, direction: {direction}, lastFloor: {LastFloor}");
 
             if (Capacity == 0)
                 return false;
@@ -125,10 +112,10 @@ namespace Otis.Sim.Elevator.Models
                 return false;
 
             if (direction == ElevatorDirection.Up)
-                return originFloor > CurrentFloor && originFloor <= lastFloor;
+                return originFloor > CurrentFloor && originFloor <= LastFloor;
 
             else if (direction == ElevatorDirection.Down)
-                return originFloor < CurrentFloor && originFloor >= lastFloor;
+                return originFloor < CurrentFloor && originFloor >= LastFloor;
 
             return false;
         }
@@ -239,10 +226,10 @@ namespace Otis.Sim.Elevator.Models
 
                 CurrentLoad += originRequest.NumberOfPeople;
 
-                //var statusMessage = originRequest.ToPickedUpRequestString(
-                //    originRequest.NumberOfPeople, Capacity);
+                var statusMessage = originRequest.ToPickedUpRequestString(
+                    originRequest.NumberOfPeople, Capacity);
 
-                //PrintRequestStatus(statusMessage);
+                PrintRequestStatus(statusMessage);
                 HandleCompletedRequest(originRequest);
             }
         }        

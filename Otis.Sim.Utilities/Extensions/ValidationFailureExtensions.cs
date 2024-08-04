@@ -1,4 +1,5 @@
 ﻿using FluentValidation.Results;
+using Otis.Sim.Utilities.Constants;
 
 namespace Otis.Sim.Utilities.Extensions
 {
@@ -11,7 +12,7 @@ namespace Otis.Sim.Utilities.Extensions
                 return string.Empty;
             }
 
-            return string.Join("\n", failures.Select(e => e.ErrorMessage));
+            return string.Join(UtilityConstants.NewLineCharacter, failures.Select(e => e.ErrorMessage));
         }
     }
 }

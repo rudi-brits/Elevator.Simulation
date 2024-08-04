@@ -1,9 +1,9 @@
-﻿using UiConstants = Otis.Sim.Interface.Constants.TerminalUiConstants;
-using Terminal.Gui;
-using System.Data;
+﻿using Otis.Sim.Elevator.Models;
 using Otis.Sim.Elevator.Services;
+using System.Data;
+using Terminal.Gui;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
-using Otis.Sim.Elevator.Models;
+using UiConstants = Otis.Sim.Interface.Constants.TerminalUiConstants;
 
 namespace Otis.Sim.Interface.Services
 {
@@ -16,6 +16,9 @@ namespace Otis.Sim.Interface.Services
         private TextField _originFloorInput { get; set; }
         private TextField _destinationFloorInput { get; set; }
         private TextField _capacityInput { get; set; }
+
+        private Thread _refreshDataThread;
+        private CancellationTokenSource _cancellationTokenSource;
 
         private ElevatorControllerService _elevatorControllerService;
 
@@ -278,17 +281,29 @@ namespace Otis.Sim.Interface.Services
 
         private void InitialiseTableDataRefresh()
         {
-            Thread refreshDataThread = new Thread(() =>
+            _cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
+            _refreshDataThread = new Thread(() =>
             {
-                while (true)
+                try
                 {
-                    Thread.Sleep(1000);
-                    Application.MainLoop.Invoke(() => {
-                        UpdateDataTable();
-                    });
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        Thread.Sleep(1000);
+                        Application.MainLoop.Invoke(() =>
+                        {
+                            UpdateDataTable();
+                        });
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    Console.WriteLine("Data refresh thread was cancelled.");
                 }
             });
-            refreshDataThread.Start();
+
+            _refreshDataThread.Start();
         }
 
         public void UpdateRequestStatus(string message)

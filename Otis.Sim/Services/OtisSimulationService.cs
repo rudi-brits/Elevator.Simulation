@@ -11,22 +11,23 @@ namespace Otis.Sim.Services
     {
         const string successPrefix = "Success - ";
 
+        private ServiceProvider _serviceProvider;
+
         public OtisSimulationService()
         {
             RunSimulation();
         }
 
-        private void RunSimulation()
+        public void RunSimulation()
         {
             var initilaisedSuccess = false;
-            ServiceProvider serviceProvider = null;
 
             try
             {
-                serviceProvider = SetupServiceCollection();
+                SetupServiceCollection();
 
-                LoadAppConfiguration(serviceProvider);
-                LoadElevatorControllerConfiguration(serviceProvider);
+                LoadAppConfiguration();
+                LoadElevatorControllerConfiguration();
 
                 initilaisedSuccess = true;
             }
@@ -44,12 +45,10 @@ namespace Otis.Sim.Services
             DisplayUserInputMessage($"Press any key to {(initilaisedSuccess ? "continue" : "exit")}...");
 
             if (initilaisedSuccess)
-            {
-                InitialiseTerminalUi(serviceProvider!);
-            }
+                InitialiseTerminalUi();
         }
 
-        private ServiceProvider SetupServiceCollection()
+        private void SetupServiceCollection()
         {
             try
             {
@@ -67,11 +66,9 @@ namespace Otis.Sim.Services
                 serviceCollection.AddSingleton<ElevatorControllerService>();
                 serviceCollection.AddSingleton<TerminalUiService>();
 
-                var serviceProvider = serviceCollection.BuildServiceProvider();
+                _serviceProvider = serviceCollection.BuildServiceProvider();
 
                 Console.WriteLine(SetupServiceCollectionMessage());
-
-                return serviceProvider;
             }
             catch (Exception exc)
             {
@@ -79,11 +76,11 @@ namespace Otis.Sim.Services
             }
         }
 
-        private void LoadAppConfiguration(ServiceProvider serviceProvider)
+        private void LoadAppConfiguration()
         {
             try
             {
-                var otisConfigurationService = serviceProvider.GetService<OtisConfigurationService>();
+                var otisConfigurationService = _serviceProvider.GetService<OtisConfigurationService>();
                 otisConfigurationService.LoadConfiguration();
 
                 Console.WriteLine(LoadAppConfigurationMessage());
@@ -94,11 +91,11 @@ namespace Otis.Sim.Services
             }
         }
 
-        private void LoadElevatorControllerConfiguration(ServiceProvider serviceProvider)
+        private void LoadElevatorControllerConfiguration()
         {
             try
             {
-                var elevatorControllerService = serviceProvider.GetService<ElevatorControllerService>();
+                var elevatorControllerService = _serviceProvider.GetService<ElevatorControllerService>();
                 elevatorControllerService.LoadConfiguration();
 
                 Console.WriteLine(LoadElevatorControllerConfigurationMessage());
@@ -109,11 +106,11 @@ namespace Otis.Sim.Services
             }
         }
 
-        private void InitialiseTerminalUi(ServiceProvider serviceProvider)
+        private void InitialiseTerminalUi()
         {
             try
             { 
-                var terminalUiService = serviceProvider.GetService<TerminalUiService>();
+                var terminalUiService = _serviceProvider.GetService<TerminalUiService>();
                 terminalUiService.InitialiseUi();
             }
             catch (Exception exc)

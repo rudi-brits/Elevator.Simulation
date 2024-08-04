@@ -1,0 +1,10 @@
+﻿using Otis.Sim.Unit.Tests.Constants;
+using System.Text.RegularExpressions;
+
+namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages.Services;
+
+[TestFixture(Category = TestConstants.MessagesCategory)]
+public abstract class MessagesTests
+{
+    protected readonly Regex _validPatternRegex = new Regex(@"\{(\d+)\}", RegexOptions.Compiled);
+}

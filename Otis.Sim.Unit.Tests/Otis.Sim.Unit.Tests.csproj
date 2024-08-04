@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Otis.Sim.Utilities\Otis.Sim.Utilities.csproj" />
+    <ProjectReference Include="..\Otis.Sim\Otis.Sim.csproj" />
   </ItemGroup>
 
 </Project>
