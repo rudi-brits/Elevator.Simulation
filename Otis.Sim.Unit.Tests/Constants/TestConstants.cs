@@ -5,6 +5,7 @@
         public const string Utilities = nameof(Utilities);
         public const string ExtensionsCategory = $"{Utilities}-Extensions";
 
-        public const string MessagesCategory = $"{Utilities}-Messages";
+        public const string ConfigurationCategory = "Configuration";
+        public const string MessagesCategory = "Messages";
     }
 }

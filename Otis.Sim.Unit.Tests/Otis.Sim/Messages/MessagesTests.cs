@@ -1,7 +1,7 @@
 ﻿using Otis.Sim.Unit.Tests.Constants;
 using System.Text.RegularExpressions;
 
-namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages.Services;
+namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages;
 
 [TestFixture(Category = TestConstants.MessagesCategory)]
 public abstract class MessagesTests
