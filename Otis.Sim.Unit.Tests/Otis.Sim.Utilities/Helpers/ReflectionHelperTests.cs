@@ -35,8 +35,7 @@ public class ReflectionHelperTests : ExtensionsTests
     /// </summary>
     public ReflectionHelperTests()
     {
-        _numberOfProperties = typeof(SampleTestClass)
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        _numberOfProperties = GetProperties<SampleTestClass>()
             .Length;
 
         _propertyNameDictionary = new Dictionary<string, string>()

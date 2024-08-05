@@ -46,9 +46,7 @@ public class BuildingConfigurationTests : ConfigurationTests
     {
         var result = _buildingConfiguration.ToString();
 
-        var properties = typeof(BuildingConfiguration)
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
+        var properties = GetProperties<BuildingConfiguration>();
         Assert.That(properties, Is.Not.Null.And.Not.Empty, "The list of properties is empty");
 
         foreach (var property in properties)
@@ -58,8 +56,8 @@ public class BuildingConfigurationTests : ConfigurationTests
                 Assert.Fail($"{result} does not contain the property {propertyName}");
 
             var propertyInfo = typeof(BuildingConfiguration).GetProperty(propertyName);
-            var propertyValue = propertyInfo?.GetValue(_buildingConfiguration);
 
+            var propertyValue = propertyInfo?.GetValue(_buildingConfiguration);
             Assert.That(propertyValue, Is.Not.Null, 
                 $"The value of {propertyName} in the model is null");
 
