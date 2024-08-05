@@ -3,6 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages;
 
+/// <summary>
+/// Class MessagesTests.
+/// </summary>
+/// <category><see cref="TestConstants.MessagesCategory" /></category>
 [TestFixture(Category = TestConstants.MessagesCategory)]
 public abstract class MessagesTests
 {

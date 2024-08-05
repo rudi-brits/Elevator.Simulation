@@ -1,36 +1,49 @@
 ﻿using Otis.Sim.Configuration.Models;
-using System.Reflection;
 
 namespace Otis.Sim.Unit.Tests.Configuration.Models;
 
 /// <summary>
-/// Class BuildingConfigurationTests, extends the <see cref="ConfigurationTests" /> class.
+/// Class BuildingConfigurationTests extends the <see cref="ConfigurationTests" /> class.
 /// </summary>
 public class BuildingConfigurationTests : ConfigurationTests
 {
     /// <summary>
-    /// Test instance of the <see cref="BuildingConfiguration" /> class.
+    /// A test instance of the <see cref="BuildingConfiguration" /> class.
     /// </summary>
-    private BuildingConfiguration _buildingConfiguration;
+    private BuildingConfiguration _buildingConfiguration = new BuildingConfiguration()
+    {
+        LowestFloor         = 10,
+        HighestFloor        = 20,
+        MaximumElevatorLoad = 30
+    };
 
     /// <summary>
-    /// Class constructor initialising and instance of the <see cref="BuildingConfiguration" /> class.
+    /// Ensure properties can be initialised as zero.
     /// </summary>
-    public BuildingConfigurationTests()
+    [Test]
+    public void DefaultInitialisation_ShouldBeZero()
     {
-        _buildingConfiguration = new BuildingConfiguration()
-        {
-            LowestFloor = 10,
-            HighestFloor = 20,
-            MaximumElevatorLoad = 30
-        };
+        var result = new BuildingConfiguration();
+        Assert.That(result.LowestFloor, Is.EqualTo(0));
+        Assert.That(result.HighestFloor, Is.EqualTo(0));
+        Assert.That(result.MaximumElevatorLoad, Is.EqualTo(0));
+    }
+
+    /// <summary>
+    /// Ensure properties' values are assigned.
+    /// </summary>
+    [Test]
+    public void PropertyAssignments_ShouldHaveAssignedValues()
+    {
+        Assert.That(_buildingConfiguration.LowestFloor, Is.EqualTo(10));
+        Assert.That(_buildingConfiguration.HighestFloor, Is.EqualTo(20));
+        Assert.That(_buildingConfiguration.MaximumElevatorLoad, Is.EqualTo(30));
     }
 
     /// <summary>
     /// Test that ToString is not empty.
     /// </summary>
     [Test]
-    [Order(1)]
     public void ToString_NotNullOrEmpty()
     {
         var result = _buildingConfiguration.ToString();
@@ -41,7 +54,6 @@ public class BuildingConfigurationTests : ConfigurationTests
     /// Test that ToString contains all instance properties and values.
     /// </summary>
     [Test]
-    [Order(2)]
     public void ToString_HasAllPropertiesAndValues()
     {
         var result = _buildingConfiguration.ToString();
@@ -59,7 +71,7 @@ public class BuildingConfigurationTests : ConfigurationTests
 
             var propertyValue = propertyInfo?.GetValue(_buildingConfiguration);
             Assert.That(propertyValue, Is.Not.Null, 
-                $"The value of {propertyName} in the model is null");
+                $"The value of {propertyName} in the is null in {result}");
 
             if (!result.Contains($"{propertyValue}"))
                 Assert.Fail($"The value of {propertyName} was not found in {result}");

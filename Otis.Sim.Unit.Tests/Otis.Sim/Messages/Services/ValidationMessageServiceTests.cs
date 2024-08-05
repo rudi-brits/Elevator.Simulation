@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages.Services;
 
 /// <summary>
-/// Class ValidationMessageServiceTests.
+/// Class ValidationMessageServiceTests extends the <see cref="MessagesTests" /> class.
 /// </summary>
 /// <category><see cref="MessagesTests" /></category>
 public class ValidationMessageServiceTests : MessagesTests
@@ -50,8 +50,6 @@ public class ValidationMessageServiceTests : MessagesTests
             Assert.Fail($"Literal init only fields were not retrieved from {nameof(ValidationMessageService)}.");
             return;
         }
-
-        Assert.IsTrue(true);
     }        
 
     [Test]
@@ -60,11 +58,11 @@ public class ValidationMessageServiceTests : MessagesTests
     /// <see cref="_validPatternRegex" />, ensuring that indexes are unique, and in range
     /// </summary>
     [Order(1)]
-    public void Fields_Format_True()
+    public void FieldsFormat_Valid()
     {
         if (!_previousTestSucceeded)
         {
-            HandlePreviousTestFailed(nameof(Fields_Format_True));
+            HandlePreviousTestFailed(nameof(FieldsFormat_Valid));
             return;
         }
 
@@ -73,7 +71,7 @@ public class ValidationMessageServiceTests : MessagesTests
             var constantValue = $"{field.GetRawConstantValue()}";
             if (string.IsNullOrWhiteSpace(constantValue))
             {
-                Assert.Fail($"{field.Name} has a null or empty value.");
+                Assert.Fail($"{field.Name} has a null or empty name.");
                 return;
             }
 

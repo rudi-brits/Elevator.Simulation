@@ -3,7 +3,7 @@
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions;
 
 /// <summary>
-/// Class IntegerExtensionsTests, extends the <see cref="ExtensionsTests" /> class.
+/// Class IntegerExtensionsTests extends the <see cref="ExtensionsTests" /> class.
 /// </summary>
 public class IntegerExtensionsTests : ExtensionsTests
 {

@@ -1,15 +1,18 @@
 ﻿using Otis.Sim.Configuration.Models;
-using System.Reflection;
 
 namespace Otis.Sim.Unit.Tests.Configuration.Models;
 
 /// <summary>
-/// Class ElevatorConfigurationTests, extends the <see cref="ConfigurationTests" /> class.
+/// Class ElevatorConfigurationTests extends the <see cref="ConfigurationTests" /> class.
 /// </summary>
 public class ElevatorConfigurationTests : ConfigurationTests
 {
+    /// <summary>
+    /// Validate the existence of all inherited properties.
+    /// Refer to <see cref="ElevatorConfigurationBaseTests" /> for inherited property values tests.
+    /// </summary>
     [Test]
-    public void ValidateInheritedProperties()
+    public void Test_InheritedProperties()
     {
         var basePropertyNames = GetPropertyNames<ElevatorConfigurationBase>();
         Assert.That(basePropertyNames, Is.Not.Null.Or.Empty);

@@ -5,19 +5,10 @@ using Otis.Sim.Utilities.Extensions;
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Extensions;
 
 /// <summary>
-/// Class ValidationFailureExtensionsTests, extends the <see cref="ExtensionsTests" /> class.
+/// Class ValidationFailureExtensionsTests extends the <see cref="ExtensionsTests" /> class.
 /// </summary>
 public class ValidationFailureExtensionsTests : ExtensionsTests
 {
-    /// <summary>
-    /// A string constant for message
-    /// </summary>
-    private const string message = nameof(message);
-    /// <summary>
-    /// A string constant for property
-    /// </summary>
-    private const string property = nameof(property);
-
     /// <summary>
     /// The list of failures
     /// </summary>
@@ -34,7 +25,7 @@ public class ValidationFailureExtensionsTests : ExtensionsTests
     {
         _failures = new List<ValidationFailure>();
         for (var i = 0; i < _failuresCount; i++)
-            _failures.Add(new ValidationFailure($"{property}{i}", $"{message}{i}"));
+            _failures.Add(new ValidationFailure($"property{i}", $"message{i}"));
     }
 
     /// <summary>
