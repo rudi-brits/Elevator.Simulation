@@ -111,7 +111,7 @@ public class ValidationMessageServiceTests : MessagesTests
     /// <returns></returns>
     private bool ValidateIndexes(string fieldName, string value)
     {
-        var matches = _validPatternRegex.Matches(value);
+        var matches = _stringInterpolationArgsRegex.Matches(value);
         if (matches.Any())
         {
             HashSet<int> sortedNumbers = new HashSet<int>();

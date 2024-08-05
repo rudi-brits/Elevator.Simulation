@@ -22,7 +22,7 @@ public class BaseMessageServiceTests : MessagesTests
         var result = BaseMessageService.FormatMessage(message, inputs);
         Assert.That(result, Is.Not.Null.And.Not.Empty);
 
-        if (_validPatternRegex.IsMatch(result))
+        if (_stringInterpolationArgsRegex.IsMatch(result))
             Assert.Fail($"The result {result} contains unresolved interpolations");
     }
 

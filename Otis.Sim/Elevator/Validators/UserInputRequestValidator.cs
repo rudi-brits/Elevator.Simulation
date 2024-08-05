@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
+using Otis.Sim.Constants;
 using Otis.Sim.Elevator.Models;
 using Otis.Sim.Interface.Validators.Helpers;
 using MessageService = Otis.Sim.Messages.Services.ValidationMessageService;
-using UiConstants = Otis.Sim.Interface.Constants.TerminalUiConstants;
 
 namespace Otis.Sim.Elevator.Validators
 {
@@ -14,19 +14,19 @@ namespace Otis.Sim.Elevator.Validators
                 .Must(value => UStringHelper.ToInteger(value).HasValue)
                     .WithMessage(Messages.Services.BaseMessageService.FormatMessage(
                         MessageService.MustBeValidInteger,
-                        UiConstants.OriginFloorName));
+                        OtisSimConstants.OriginFloorName));
 
             RuleFor(model => model.DestinationFloorInput)
                 .Must(value => UStringHelper.ToInteger(value).HasValue)
                     .WithMessage(Messages.Services.BaseMessageService.FormatMessage(
                         MessageService.MustBeValidInteger,
-                        UiConstants.DestinationFloorName));
+                        OtisSimConstants.DestinationFloorName));
 
             RuleFor(model => model.CapacityInput)
                 .Must(value => UStringHelper.ToInteger(value).HasValue)
                     .WithMessage(Messages.Services.BaseMessageService.FormatMessage(
                         MessageService.MustBeValidInteger,
-                        UiConstants.NumberOfPeopleName));
+                        OtisSimConstants.NumberOfPeopleName));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Otis.Sim.Elevator.Models;
+﻿using Otis.Sim.Constants;
+using Otis.Sim.Elevator.Models;
 using Otis.Sim.Elevator.Services;
 using System.Data;
 using Terminal.Gui;
@@ -111,62 +112,62 @@ namespace Otis.Sim.Interface.Services
 
             _elevatorsTableView = new TableView()
             {
-                X = 0,
-                Y = 1,
-                Width = Dim.Fill(),
-                Height = Dim.Fill(),
-                CanFocus = false,
+                X             = 0,
+                Y             = 1,
+                Width         = Dim.Fill(),
+                Height        = Dim.Fill(),
+                CanFocus      = false,
                 FullRowSelect = true,
-                ColorScheme = _globalColorScheme
+                ColorScheme   = _globalColorScheme
             };
             elevatorStatusFrameView.Add(_elevatorsTableView);
 
             var originFloorLabel = new Label()
             {
-                Y = 1,
-                Text = UiConstants.OriginFloorName
+                Y    = 1,
+                Text = OtisSimConstants.OriginFloorName
             };
 
             _originFloorInput = new TextField("")
             {
-                Y = Pos.Top(originFloorLabel),
-                X = Pos.Right(originFloorLabel) + 1,
+                Y     = Pos.Top(originFloorLabel),
+                X     = Pos.Right(originFloorLabel) + 1,
                 Width = Dim.Fill()
             };
 
             var destinationFloorLabel = new Label()
             {
-                Y = Pos.Top(originFloorLabel) + 2,
-                Text = UiConstants.DestinationFloorName
+                Y    = Pos.Top(originFloorLabel) + 2,
+                Text = OtisSimConstants.DestinationFloorName
             };
 
             _destinationFloorInput = new TextField("")
             {
-                Y = Pos.Top(destinationFloorLabel),
-                X = Pos.Right(destinationFloorLabel) + 1,
+                Y     = Pos.Top(destinationFloorLabel),
+                X     = Pos.Right(destinationFloorLabel) + 1,
                 Width = Dim.Fill()
             };
 
             var capacityLabel = new Label()
             {
-                Y = Pos.Top(destinationFloorLabel) + 2,
-                X = Pos.Left(destinationFloorLabel),
-                Text = UiConstants.NumberOfPeopleName
+                Y    = Pos.Top(destinationFloorLabel) + 2,
+                X    = Pos.Left(destinationFloorLabel),
+                Text = OtisSimConstants.NumberOfPeopleName
             };
 
             _capacityInput = new TextField("")
             {
-                Y = Pos.Top(capacityLabel),
-                X = Pos.Right(capacityLabel) + 1,
-                Width = Dim.Fill(),
+                Y        = Pos.Top(capacityLabel),
+                X        = Pos.Right(capacityLabel) + 1,
+                Width    = Dim.Fill(),
                 CanFocus = true,
             };
 
             var requestButton = new Button()
             {
-                Text = "Request elevator",
-                Y = Pos.Top(capacityLabel) + 2,
-                X = Pos.Center(),
+                Text      = "Request elevator",
+                Y         = Pos.Top(capacityLabel) + 2,
+                X         = Pos.Center(),
                 IsDefault = true
             };
 

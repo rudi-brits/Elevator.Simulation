@@ -1,6 +1,6 @@
-﻿using Otis.Sim.Interface.Validators.Helpers;
+﻿using Otis.Sim.Constants;
+using Otis.Sim.Interface.Validators.Helpers;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
-using UiConstants = Otis.Sim.Interface.Constants.TerminalUiConstants;
 
 namespace Otis.Sim.Elevator.Models
 {
@@ -42,8 +42,8 @@ namespace Otis.Sim.Elevator.Models
         public string ToDuplicateRequestString()
         {
             return
-                $"{UiConstants.OriginFloorName}: {OriginFloor}, " +
-                $"{UiConstants.DestinationFloorName}: {DestinationFloor}, " +
+                $"{OtisSimConstants.OriginFloorName}: {OriginFloor}, " +
+                $"{OtisSimConstants.DestinationFloorName}: {DestinationFloor}, " +
                 $"{nameof(Direction)}: {Direction}";
         }
 
@@ -51,9 +51,9 @@ namespace Otis.Sim.Elevator.Models
         {
             return
                 $"{nameof(Id)}: {Id}, " +
-                $"{UiConstants.OriginFloorName}: {OriginFloor}, " + 
-                $"{UiConstants.DestinationFloorName}: {DestinationFloor}, " + 
-                $"{UiConstants.PeopleName}: {NumberOfPeople}, " +
+                $"{OtisSimConstants.OriginFloorName}: {OriginFloor}, " + 
+                $"{OtisSimConstants.DestinationFloorName}: {DestinationFloor}, " + 
+                $"{OtisSimConstants.PeopleName}: {NumberOfPeople}, " +
                 $"Status: {RequestStatus}, " +
                 $"{nameof(Direction)}: {Direction}";
         }

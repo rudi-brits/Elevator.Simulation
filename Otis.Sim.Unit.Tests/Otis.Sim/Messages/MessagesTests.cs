@@ -10,5 +10,5 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages;
 [TestFixture(Category = TestConstants.MessagesCategory)]
 public abstract class MessagesTests
 {
-    protected readonly Regex _validPatternRegex = new Regex(@"\{(\d+)\}", RegexOptions.Compiled);
+    protected readonly Regex _stringInterpolationArgsRegex = new Regex(@"\{(\d+)\}", RegexOptions.Compiled);
 }

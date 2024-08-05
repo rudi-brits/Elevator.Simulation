@@ -1,5 +1,5 @@
-﻿using static Otis.Sim.Elevator.Enums.ElevatorEnum;
-using UiConstants = Otis.Sim.Interface.Constants.TerminalUiConstants;
+﻿using Otis.Sim.Constants;
+using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 
 namespace Otis.Sim.Elevator.Models
 {
@@ -22,7 +22,7 @@ namespace Otis.Sim.Elevator.Models
 
         private string _toEmbarkDisembarkString(string description, int numberOfPeople, int capacity)
             => $"{ToStatusString($"{ElevatorStatus.DoorsOpen} ({description})")}, " +
-               $"{UiConstants.PeopleName}: {numberOfPeople}, " +
+               $"{OtisSimConstants.PeopleName}: {numberOfPeople}, " +
                $"Capacity: {capacity}, ";
 
         public string ToCompletedRequestString()
@@ -35,9 +35,9 @@ namespace Otis.Sim.Elevator.Models
         {
             return
                 $"{nameof(Id)}: {Id}, " +
-                $"{UiConstants.OriginFloorName}: {OriginFloor}, " +
-                $"{UiConstants.DestinationFloorName}: {DestinationFloor}, " +
-                $"{UiConstants.PeopleName}: {NumberOfPeople}, " +
+                $"{OtisSimConstants.OriginFloorName}: {OriginFloor}, " +
+                $"{OtisSimConstants.DestinationFloorName}: {DestinationFloor}, " +
+                $"{OtisSimConstants.PeopleName}: {NumberOfPeople}, " +
                 $"Status: {status}, " +
                 $"Direction: {RequestDirection}, " +
                 $"Elevator: {ElevatorName}";
