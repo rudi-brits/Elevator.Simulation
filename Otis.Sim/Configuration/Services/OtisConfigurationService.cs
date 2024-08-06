@@ -14,19 +14,22 @@ namespace Otis.Sim.Configuration.Services
 
         public void LoadConfiguration()
         {
-            string jsonConfiguration = File.ReadAllText("appsettings.json");
-            var serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var otisConfiguration = JsonSerializer.Deserialize<OtisConfiguration>(jsonConfiguration, serializerOptions);
+            string jsonConfiguration = ReadAppSettings();
+            var serializerOptions    = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var otisConfiguration    = JsonSerializer.Deserialize<OtisConfiguration>(jsonConfiguration, serializerOptions);
 
-            var validator = new OtisConfigurationValidator();
+            var validator        = new OtisConfigurationValidator();
             var validationResult = validator.Validate(otisConfiguration);
 
             if (!validationResult.IsValid)
             {
-                throw new Exception(validationResult.Errors.ToNewLineString());
+                throw new ArgumentException(validationResult.Errors.ToNewLineString());
             }
 
             _configuration = otisConfiguration;
         }
+
+        protected virtual string ReadAppSettings()
+            => File.ReadAllText("appsettings.json");
     }
 }

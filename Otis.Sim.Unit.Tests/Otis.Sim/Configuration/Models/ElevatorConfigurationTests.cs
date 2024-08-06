@@ -14,10 +14,10 @@ public class ElevatorConfigurationTests : ConfigurationTests
     [Test]
     public void Test_InheritedProperties()
     {
-        var basePropertyNames = GetPropertyNames<ElevatorConfigurationBase>();
+        var basePropertyNames = GetPublicPropertyNames<ElevatorConfigurationBase>();
         Assert.That(basePropertyNames, Is.Not.Null.Or.Empty);
 
-        var derivedPropertyNames = GetPropertyNames<ElevatorConfiguration>();
+        var derivedPropertyNames = GetPublicPropertyNames<ElevatorConfiguration>();
         Assert.That(derivedPropertyNames, Is.Not.Null.Or.Empty);
 
         Assert.IsTrue(basePropertyNames.All(derivedPropertyNames.Contains),

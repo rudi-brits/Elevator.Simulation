@@ -1,40 +1,72 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Otis.Sim.Interface.Services
+namespace Otis.Sim.Interface.Services;
+
+/// <summary>
+/// The ConsoleFullScreenService class.
+/// </summary>
+public class ConsoleFullScreenService
 {
-    public class ConsoleFullScreenService
+    /// <summary>
+    /// GetConsoleWindow kernel32.dll function.
+    /// </summary>
+    /// <returns></returns>
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr GetConsoleWindow();
+    /// <summary>
+    /// GetWindowLong user32.dll function.
+    /// </summary>
+    /// <returns></returns>
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    /// <summary>
+    /// SetWindowLong user32.dll function.
+    /// </summary>
+    /// <returns></returns>
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+    /// <summary>
+    /// ShowWindow user32.dll function.
+    /// </summary>
+    /// <returns></returns>
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    /// <summary>
+    /// GWL_STYLE constant.
+    /// </summary>
+    private static int GWL_STYLE      = -16;
+    /// <summary>
+    /// SW_MAXIMIZE constant.
+    /// </summary>
+    private static int SW_MAXIMIZE    = 3;
+    /// <summary>
+    /// WS_MAXIMIZEBOX constant.
+    /// </summary>
+    private static int WS_MAXIMIZEBOX = 0x10000;
+    /// <summary>
+    /// WS_MINIMIZEBOX constant.
+    /// </summary>
+    private static int WS_MINIMIZEBOX = 0x20000;
+    /// <summary>
+    /// WS_SIZEBOX constant.
+    /// </summary>
+    private static int WS_SIZEBOX     = 0x40000;
+
+    /// <summary>
+    /// The InitialiseFullScreen function.
+    /// </summary>
+    protected void InitialiseFullScreen()
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr GetConsoleWindow();
+        IntPtr consoleWindow = GetConsoleWindow();
 
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        private const int GWL_STYLE = -16;
-        private const int SW_MAXIMIZE = 3;
-        private const int WS_MAXIMIZEBOX = 0x10000;
-        private const int WS_MINIMIZEBOX = 0x20000;
-        private const int WS_SIZEBOX = 0x40000;
-
-        protected void InitialiseFullScreen()
+        if (consoleWindow != IntPtr.Zero)
         {
-            IntPtr consoleWindow = GetConsoleWindow();
-
-            if (consoleWindow != IntPtr.Zero)
-            {
-                ShowWindow(consoleWindow, SW_MAXIMIZE);
-            }
-
-            int style = GetWindowLong(consoleWindow, GWL_STYLE);
-            style &= ~(WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX);
-
-            SetWindowLong(consoleWindow, GWL_STYLE, style);
+            ShowWindow(consoleWindow, SW_MAXIMIZE);
         }
+
+        int style = GetWindowLong(consoleWindow, GWL_STYLE);
+        style &= ~(WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX);
+
+        SetWindowLong(consoleWindow, GWL_STYLE, style);
     }
 }

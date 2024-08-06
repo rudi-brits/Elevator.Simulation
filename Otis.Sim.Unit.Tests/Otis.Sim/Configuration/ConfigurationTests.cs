@@ -6,8 +6,8 @@ namespace Otis.Sim.Unit.Tests.Configuration;
 /// <summary>
 /// Class ConfigurationTests extends the <see cref="BaseTestService" /> class.
 /// </summary>
-/// <category><see cref="TestConstants.ExtensionsCategory" /></category>
-[TestFixture(Category = TestConstants.MessagesCategory)]
+/// <category><see cref="TestConstants.ConfigurationCategory" /></category>
+[TestFixture(Category = TestConstants.ConfigurationCategory)]
 public abstract class ConfigurationTests : BaseTestService
 {
 }

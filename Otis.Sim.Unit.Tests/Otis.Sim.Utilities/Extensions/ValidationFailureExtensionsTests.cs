@@ -19,9 +19,10 @@ public class ValidationFailureExtensionsTests : ExtensionsTests
     private int _failuresCount = 3;
 
     /// <summary>
-    /// Class constructor. Generates number of failures using the <see cref="_failuresCount" /> value
+    /// Setup before any tests are run
     /// </summary>
-    public ValidationFailureExtensionsTests()
+    [OneTimeSetUp]
+    public void OneTimeSetup()
     {
         _failures = new List<ValidationFailure>();
         for (var i = 0; i < _failuresCount; i++)

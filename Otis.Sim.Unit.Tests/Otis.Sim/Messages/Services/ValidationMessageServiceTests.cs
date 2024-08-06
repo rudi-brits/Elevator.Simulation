@@ -1,4 +1,5 @@
 ﻿using Otis.Sim.Messages.Services;
+using Otis.Sim.Unit.Tests.Constants;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -7,7 +8,6 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages.Services;
 /// <summary>
 /// Class ValidationMessageServiceTests extends the <see cref="MessagesTests" /> class.
 /// </summary>
-/// <category><see cref="MessagesTests" /></category>
 public class ValidationMessageServiceTests : MessagesTests
 {
     /// <summary>
@@ -28,13 +28,12 @@ public class ValidationMessageServiceTests : MessagesTests
     IEnumerable<FieldInfo> _fieldInfo;
 
     /// <summary>
-    /// Class constructor
+    /// Setup before any tests are run.
     /// </summary>
-    public ValidationMessageServiceTests()
+    [OneTimeSetUp]
+    public void OneTimeSetup()
     {
-        _fieldInfo = typeof(ValidationMessageService)
-            .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-            .Where(field => field.IsLiteral && !field.IsInitOnly);
+        _fieldInfo = GetPublicStaticLiteralFieldsInfo<ValidationMessageService>();
     }
 
     /// <summary>
@@ -47,7 +46,7 @@ public class ValidationMessageServiceTests : MessagesTests
         if (_fieldInfo?.Any() != true)
         {
             _previousTestSucceeded = false;
-            Assert.Fail($"Literal init only fields were not retrieved from {nameof(ValidationMessageService)}.");
+            Assert.Fail(TestConstants.EmptyLiteralFieldsMessage);
             return;
         }
     }        
@@ -66,17 +65,17 @@ public class ValidationMessageServiceTests : MessagesTests
             return;
         }
 
-        foreach (var field in _fieldInfo)
+        foreach (var validationConstant in _fieldInfo)
         {
-            var constantValue = $"{field.GetRawConstantValue()}";
+            var constantValue = $"{validationConstant.GetRawConstantValue()}";
             if (string.IsNullOrWhiteSpace(constantValue))
             {
-                Assert.Fail($"{field.Name} has a null or empty name.");
+                Assert.Fail($"{validationConstant.Name} {TestConstants.HasAnEmptyValue}");
                 return;
             }
 
-            if (ValidateFormat(field.Name, constantValue))
-                ValidateIndexes(field.Name, constantValue);
+            if (ValidateFormat(validationConstant.Name, constantValue))
+                ValidateIndexes(validationConstant.Name, constantValue);
         }
     }
 

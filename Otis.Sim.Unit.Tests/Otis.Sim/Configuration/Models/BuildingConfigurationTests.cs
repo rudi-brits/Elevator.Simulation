@@ -1,4 +1,5 @@
 ﻿using Otis.Sim.Configuration.Models;
+using Otis.Sim.Unit.Tests.Constants;
 
 namespace Otis.Sim.Unit.Tests.Configuration.Models;
 
@@ -58,8 +59,8 @@ public class BuildingConfigurationTests : ConfigurationTests
     {
         var result = _buildingConfiguration.ToString();
 
-        var properties = GetProperties<BuildingConfiguration>();
-        Assert.That(properties, Is.Not.Null.And.Not.Empty, "The list of properties is empty");
+        var properties = GetPublicInstanceProperties<BuildingConfiguration>();
+        Assert.That(properties, Is.Not.Null.And.Not.Empty, TestConstants.EmptyPropertiesMessage);
 
         foreach (var property in properties)
         {

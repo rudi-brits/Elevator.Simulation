@@ -24,11 +24,12 @@ public class ReflectionHelperTests : HelperTests
     private int _numberOfProperties;
 
     /// <summary>
-    /// Class constructor
+    /// Setup before any tests are run.
     /// </summary>
-    public ReflectionHelperTests()
+    [OneTimeSetUp]
+    public void OneTimeSetup()
     {
-        _numberOfProperties = GetProperties<SampleTestClass>()
+        _numberOfProperties = GetPublicInstanceProperties<SampleTestClass>()
             .Length;
     }
 

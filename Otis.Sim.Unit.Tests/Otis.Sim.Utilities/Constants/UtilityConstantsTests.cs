@@ -6,7 +6,7 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Constants;
 /// <summary>
 /// Class UtilityConstantsTests.
 /// </summary>
-/// <category><see cref="TestConstants.ExtensionsCategory" /></category>
+/// <category><see cref="TestConstants.UtilitiesConstantsCategory" /></category>
 [TestFixture(Category = TestConstants.UtilitiesConstantsCategory)]
 public class UtilityConstantsTests
 {

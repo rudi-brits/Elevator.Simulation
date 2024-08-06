@@ -1,26 +1,37 @@
-﻿namespace Otis.Sim.Elevator.Enums
+﻿namespace Otis.Sim.Elevator.Enums;
+
+/// <summary>
+/// The ElevatorEnum class.
+/// </summary>
+public class ElevatorEnum
 {
-    public class ElevatorEnum
+    /// <summary>
+    /// The RequestStatus enum.
+    /// </summary>
+    public enum RequestStatus
     {
-        public enum RequestStatus
-        {
-            Pending,
-            Assigned,
-            Complete
-        }
+        Pending,
+        Assigned,
+        Complete
+    }
 
-        public enum ElevatorStatus
-        {
-            Idle,
-            MovingUp,
-            MovingDown,
-            DoorsOpen
-        }
+    /// <summary>
+    /// The ElevatorStatus enum.
+    /// </summary>
+    public enum ElevatorStatus
+    {
+        Idle,
+        MovingUp,
+        MovingDown,
+        DoorsOpen
+    }
 
-        public enum ElevatorDirection
-        {
-            Up,
-            Down
-        }
+    /// <summary>
+    /// The ElevatorDirection enum.
+    /// </summary>
+    public enum ElevatorDirection
+    {
+        Up,
+        Down
     }
 }

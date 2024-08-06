@@ -5,7 +5,6 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Messages.Services;
 /// <summary>
 /// Class BaseMessageServiceTests extends the <see cref="MessagesTests" /> class.
 /// </summary>
-/// <category><see cref="MessagesTests" /></category>
 public class BaseMessageServiceTests : MessagesTests
 {
     /// <summary>
