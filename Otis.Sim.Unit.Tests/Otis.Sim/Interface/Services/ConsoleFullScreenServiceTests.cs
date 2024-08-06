@@ -15,9 +15,10 @@ public class ConsoleFullScreenServiceTests : InterfaceTests
     private FieldInfo[] _fieldInfo;
 
     /// <summary>
-    /// Class constructor.
+    /// OneTimeSetUp of mocks and services.
     /// </summary>
-    public ConsoleFullScreenServiceTests()
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
         _fieldInfo = GetNonPublicStaticFields<ConsoleFullScreenService>();
     }
@@ -55,8 +56,7 @@ public class ConsoleFullScreenServiceTests : InterfaceTests
     {
         ConsoleFullScreenService consoleFullScreenService = new ConsoleFullScreenService();
 
-        var methodInfo = typeof(ConsoleFullScreenService)
-                .GetMethod("InitialiseFullScreen", BindingFlags.NonPublic | BindingFlags.Instance);
+        var methodInfo = GetNonPublicInstanceMethod<ConsoleFullScreenService>("InitialiseFullScreen");
         Assert.That(methodInfo, Is.Not.Null);
 
         Assert.DoesNotThrow(() =>

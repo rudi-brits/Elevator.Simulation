@@ -10,16 +10,16 @@ namespace Otis.Sim.Interface.Services
 {
     public class TerminalUiService : ConsoleFullScreenService
     {
-        private ColorScheme _globalColorScheme { get; set; }
-        private ColorScheme _idleColorScheme { get; set; }
-        private TextView _requestStatusView { get; set; }
-        private TableView _elevatorsTableView { get; set; }
-        private TextField _originFloorInput { get; set; }
-        private TextField _destinationFloorInput { get; set; }
-        private TextField _capacityInput { get; set; }
+        private ColorScheme? _globalColorScheme { get; set; }
+        private ColorScheme? _idleColorScheme { get; set; }
+        private TextView? _requestStatusView { get; set; }
+        private TableView? _elevatorsTableView { get; set; }
+        private TextField? _originFloorInput { get; set; }
+        private TextField? _destinationFloorInput { get; set; }
+        private TextField? _capacityInput { get; set; }
 
-        private Thread _refreshDataThread;
-        private CancellationTokenSource _cancellationTokenSource;
+        private Thread? _refreshDataThread;
+        private CancellationTokenSource? _cancellationTokenSource;
 
         private ElevatorControllerService _elevatorControllerService;
 
@@ -36,7 +36,7 @@ namespace Otis.Sim.Interface.Services
             InitialiseLayout();
         }
 
-        private void InitialiseColorSchemes()
+        protected void InitialiseColorSchemes()
         {
             _globalColorScheme = new ColorScheme()
             {
@@ -197,9 +197,9 @@ namespace Otis.Sim.Interface.Services
         { 
             var request = new UserInputRequest
             {
-                OriginFloorInput      = _originFloorInput.Text,
-                DestinationFloorInput = _destinationFloorInput.Text,
-                CapacityInput         = _capacityInput.Text
+                OriginFloorInput      = _originFloorInput!.Text,
+                DestinationFloorInput = _destinationFloorInput!.Text,
+                CapacityInput         = _capacityInput!.Text
             };
 
             var response = _elevatorControllerService.RequestElevator(request);
@@ -232,7 +232,7 @@ namespace Otis.Sim.Interface.Services
 
         private void CreateElevatorTable()
         {
-            _elevatorsTableView.Table = new DataTable();
+            _elevatorsTableView!.Table = new DataTable();
             _elevatorControllerService.ElevatorTableHeaders.ForEach(tableHeader =>
             {
                 _elevatorsTableView.Table.Columns.Add(tableHeader);
@@ -260,7 +260,7 @@ namespace Otis.Sim.Interface.Services
 
         private void UpdateDataTable()
         {
-            _elevatorsTableView.Table.Rows.Clear();
+            _elevatorsTableView!.Table.Rows.Clear();
             AddElevatorRows();
             _elevatorsTableView.SetNeedsDisplay();
         }
@@ -269,7 +269,7 @@ namespace Otis.Sim.Interface.Services
         {
             _elevatorControllerService.ElevatorDataRows.ForEach(dataRow =>
             {
-                _elevatorsTableView.Table.Rows.Add(
+                _elevatorsTableView!.Table.Rows.Add(
                     dataRow.Id,
                     dataRow.Name,
                     dataRow.CurrentFloor,

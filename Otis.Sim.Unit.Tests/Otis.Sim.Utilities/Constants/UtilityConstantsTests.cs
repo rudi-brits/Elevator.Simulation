@@ -10,6 +10,9 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Utilities.Constants;
 [TestFixture(Category = TestConstants.UtilitiesConstantsCategory)]
 public class UtilityConstantsTests
 {
+    /// <summary>
+    /// Ensure that UtilityConstants.NewLineCharacter is not empty.
+    /// </summary>
     [Test]
     public void NewLineCharacter_HasValue()
     {

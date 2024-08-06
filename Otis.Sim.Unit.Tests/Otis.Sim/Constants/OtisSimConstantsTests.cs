@@ -25,6 +25,7 @@ public class OtisSimConstantsTests : BaseTestService
     {
         _fieldInfo = GetPublicStaticLiteralFieldsInfo<OtisSimConstants>();
     }
+
     /// <summary>
     /// Ensure the class has constants.
     /// </summary>
