@@ -5,7 +5,7 @@ namespace Otis.Sim.Elevator.Models
 {
     public class ElevatorAcceptedRequest : ElevatorRequestBase
     {
-        public string ElevatorName { get; set; }
+        public string ElevatorName { get; set; } = "";
         public ElevatorDirection RequestDirection { get; set; }
         public bool OriginFloorServiced { get; set; }
         public bool DestinationFloorServiced { get; set; }
