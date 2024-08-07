@@ -42,9 +42,9 @@ namespace Otis.Sim.Elevator.Services
 
             _elevatorRequestValidationValues = new ElevatorRequestValidationValues()
             {
-                LowestFloor = _elevators.Min(elevator => elevator.LowestFloor),
+                LowestFloor  = _elevators.Min(elevator => elevator.LowestFloor),
                 HighestFloor = _elevators.Max(elevator => elevator.HighestFloor),
-                MaximumLoad = buildingConfiguration.MaximumElevatorLoad
+                MaximumLoad  = buildingConfiguration.MaximumElevatorLoad
             };
 
             PrintLoadedConfiguration();

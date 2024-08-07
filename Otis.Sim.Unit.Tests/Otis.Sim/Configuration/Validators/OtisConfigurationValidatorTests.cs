@@ -1,6 +1,7 @@
 ﻿using FluentValidation.TestHelper;
 using Otis.Sim.Configuration.Models;
 using Otis.Sim.Configuration.Validators;
+using Otis.Sim.Constants;
 using Otis.Sim.Unit.Tests.Configuration;
 using MessageService = Otis.Sim.Messages.Services.ValidationMessageService;
 
@@ -107,6 +108,41 @@ public class OtisConfigurationValidatorTests : ConfigurationTests
 
         var errorMessage = MessageService.FormatMessage(MessageService.MayNotBeEmpty,
             nameof(otisConfiguration.ElevatorsConfiguration));
+
+        var result = _validator.TestValidate(otisConfiguration);
+        result.ShouldHaveValidationErrorFor(config => config.ElevatorsConfiguration)
+            .Where(message => message.ErrorMessage.Contains(errorMessage));
+    }
+
+    /// <summary>
+    /// Test with correct error message when ElevatorConfiguration has duplicates descriptions.
+    /// </summary>
+    [Test]
+    public void ElevatorsConfigurationDuplicateDescription_Error()
+    {
+        var otisConfiguration = new OtisConfiguration
+        {
+            BuildingConfiguration = _validBuildingConfiguration,
+            ElevatorsConfiguration = new List<ElevatorConfiguration>()
+            {
+                new ElevatorConfiguration
+                {
+                    Description = "Elevator 1",
+                    LowestFloor = 1,
+                    HighestFloor = 10
+                },
+                new ElevatorConfiguration
+                {
+                    Description = "Elevator 1",
+                    LowestFloor = 1,
+                    HighestFloor = 10
+                }
+            }            
+        };
+
+        var errorMessage = MessageService.FormatMessage(
+            MessageService.MayNotContainDuplicateValues,
+            $"{OtisSimConstants.Elevator} {nameof(ElevatorConfiguration.Description)}");
 
         var result = _validator.TestValidate(otisConfiguration);
         result.ShouldHaveValidationErrorFor(config => config.ElevatorsConfiguration)

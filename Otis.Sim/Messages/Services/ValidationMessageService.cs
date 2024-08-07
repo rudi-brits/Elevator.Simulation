@@ -12,5 +12,6 @@
         public const string MustBeWithinRange = "The {0} must be between {1} and {2}.";
         public const string MayNotBeEqualTo = "{0} may not be equal to {1}";
         public const string DuplicateElevatorRequest = "A request from {0} to {1} going {2} is already pending.";
+        public const string MayNotContainDuplicateValues = "Duplicate {0} values are not allowed.";
     }
 }

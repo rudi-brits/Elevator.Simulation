@@ -290,5 +290,13 @@ namespace Otis.Sim.Elevator.Models
                .Where(request => request.Id != id)
                .ToList();
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Description)}: {Description}, " +
+                $"{nameof(LowestFloor)}: {LowestFloor}, " +
+                $"{nameof(HighestFloor)}: {HighestFloor}, " +
+                $"{nameof(MaximumLoad)}: {MaximumLoad}";
+        }
     }
 }
