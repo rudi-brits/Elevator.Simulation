@@ -19,7 +19,7 @@ namespace Otis.Sim.Configuration.Services
             var otisConfiguration    = JsonSerializer.Deserialize<OtisConfiguration>(jsonConfiguration, serializerOptions);
 
             var validator        = new OtisConfigurationValidator();
-            var validationResult = validator.Validate(otisConfiguration);
+            var validationResult = validator.Validate(otisConfiguration!);
 
             if (!validationResult.IsValid)
             {

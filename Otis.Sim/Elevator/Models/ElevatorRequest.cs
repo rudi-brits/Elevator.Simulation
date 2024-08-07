@@ -34,9 +34,9 @@ namespace Otis.Sim.Elevator.Models
         public ElevatorRequest(UserInputRequest userInputRequest)
         {
             Id               = Guid.NewGuid();
-            OriginFloor      = (int)UStringHelper.ToInteger(userInputRequest.OriginFloorInput);
-            DestinationFloor = (int)UStringHelper.ToInteger(userInputRequest.DestinationFloorInput);
-            NumberOfPeople   = (int)UStringHelper.ToInteger(userInputRequest.CapacityInput);
+            OriginFloor      = (int)UStringHelper.ToInteger(userInputRequest.OriginFloorInput)!;
+            DestinationFloor = (int)UStringHelper.ToInteger(userInputRequest.DestinationFloorInput)!;
+            NumberOfPeople   = (int)UStringHelper.ToInteger(userInputRequest.CapacityInput)!;
         }
 
         public string ToDuplicateRequestString()

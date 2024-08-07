@@ -16,18 +16,28 @@ namespace Otis.Sim.Elevator.Models
         {
             get
             {
-                _isPrimaryDirection = _primaryDirectionQueue.Any();
+                if (_primaryDirectionQueue.Any())
+                {
+                    _isPrimaryDirection = true;
 
-                return _currentStatus == ElevatorStatus.MovingDown
-                    ? _currentDirectionQueue.OrderByDescending(x => x).FirstOrDefault()
-                    : _currentDirectionQueue.FirstOrDefault();
+                    if (_currentStatus == ElevatorStatus.MovingUp)
+                        return _primaryDirectionQueue.First();
+
+                    return _primaryDirectionQueue.OrderByDescending(x => x).First();
+                }
+                if (_secondaryDirectionQueue.Any())
+                {
+                    _isPrimaryDirection = false;
+
+                    if (_currentStatus == ElevatorStatus.MovingUp)
+                        return _secondaryDirectionQueue.First();
+
+                    return _secondaryDirectionQueue.OrderByDescending(x => x).First();
+                }
+
+                return null;
             }
         }
-        public int? LastFloor 
-            => _currentStatus == ElevatorStatus.MovingDown
-                ? _currentDirectionQueue.OrderByDescending(x => x).LastOrDefault()
-                : _currentDirectionQueue.LastOrDefault();
-
         public int CurrentLoad { get; set; } = 0;
         public int MaximumLoad { get; set; }
         public int Capacity => MaximumLoad - CurrentLoad;
@@ -52,13 +62,9 @@ namespace Otis.Sim.Elevator.Models
         private ElevatorStatus _currentStatus { get; set; } = ElevatorStatus.Idle;
         public ElevatorStatus CurrentStatus => _currentStatus;
 
-        private bool _isMoving = false;
-
         private bool _isPrimaryDirection { get; set; } = true;
         private SortedSet<int> _primaryDirectionQueue = new SortedSet<int>();
         private SortedSet<int> _secondaryDirectionQueue = new SortedSet<int>();
-        private SortedSet<int> _currentDirectionQueue
-            => _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
 
         private List<ElevatorAcceptedRequest> _acceptedRequests = new List<ElevatorAcceptedRequest>();
 
@@ -100,7 +106,12 @@ namespace Otis.Sim.Elevator.Models
 
         private bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
         {
-            Debug.WriteLine($"originFloor: {originFloor}, direction: {direction}, lastFloor: {LastFloor}");
+            var targetQueue = _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
+            var lastFloor = _currentStatus == ElevatorStatus.MovingUp
+                ? targetQueue.LastOrDefault()
+                : targetQueue.OrderByDescending(x => x).LastOrDefault();
+
+            Debug.WriteLine($"currentFloor: {CurrentFloor}, originFloor: {originFloor}, direction: {direction}, lastFloor: {lastFloor}");
 
             if (Capacity == 0)
                 return false;
@@ -112,10 +123,21 @@ namespace Otis.Sim.Elevator.Models
                 return false;
 
             if (direction == ElevatorDirection.Up)
-                return originFloor > CurrentFloor && originFloor <= LastFloor;
+                return originFloor > CurrentFloor;
 
             else if (direction == ElevatorDirection.Down)
-                return originFloor < CurrentFloor && originFloor >= LastFloor;
+                return originFloor < CurrentFloor;
+
+            return false;
+        }
+
+        private bool IsSameDirectionOnRoute(int requestOriginFloor, ElevatorDirection requestDirection)
+        {
+            if (requestDirection == ElevatorDirection.Up)
+                return requestOriginFloor > CurrentFloor;
+
+            if (requestDirection == ElevatorDirection.Down)
+                return requestOriginFloor < CurrentFloor;
 
             return false;
         }
@@ -147,10 +169,10 @@ namespace Otis.Sim.Elevator.Models
                 acceptedRequest.ElevatorName = Description;
 
                 _acceptedRequests.Add(acceptedRequest);
+
                 PrintRequestStatus(acceptedRequest.ToAcceptedRequestString());
 
-                if (!_isMoving)
-                    MoveElevator();
+                _floorMoveTimer.Change(0, FloorMoveTime);
 
                 return true;
             }
@@ -181,7 +203,8 @@ namespace Otis.Sim.Elevator.Models
                 else
                     _secondaryDirectionQueue.Remove((int)nextFloor);
 
-                StopElevator();
+                _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
                 OpenDoors();
             }
         }
@@ -227,17 +250,17 @@ namespace Otis.Sim.Elevator.Models
                 CurrentLoad += originRequest.NumberOfPeople;
 
                 var statusMessage = originRequest.ToPickedUpRequestString(
-                    originRequest.NumberOfPeople, Capacity);
+                   originRequest.NumberOfPeople, Capacity);
 
                 PrintRequestStatus(statusMessage);
                 HandleCompletedRequest(originRequest);
             }
-        }        
+        }
 
         private void CloseDoors(object? state)
         {
-           _doorsOpenTimer.Change(Timeout.Infinite, Timeout.Infinite);
-           MoveToNextFloor();
+            _doorsOpenTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            MoveToNextFloor();
         }
 
         private void MoveToNextFloor()
@@ -245,22 +268,10 @@ namespace Otis.Sim.Elevator.Models
             if (NextFloor == null)
             {
                 _currentStatus = ElevatorStatus.Idle;
-                StopElevator();
+                _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
             }
             else
-                MoveElevator();
-        }
-
-        private void MoveElevator()
-        {
-            _floorMoveTimer.Change(0, FloorMoveTime);
-            _isMoving = true;
-        }
-
-        private void StopElevator()
-        {
-            _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
-            _isMoving = false;
+                _floorMoveTimer.Change(0, FloorMoveTime);
         }
 
         private void HandleCompletedRequest(ElevatorAcceptedRequest request)

@@ -45,6 +45,24 @@ public abstract class BaseTestService
             .GetFields(BindingFlags.NonPublic | BindingFlags.Static);
 
     /// <summary>
+    /// Gets a PropertyInfo[] of non public instance fields.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns>An array of <see cref="FieldInfo"/></returns>
+    protected FieldInfo[] GetNonPublicInstanceFields<T>()
+        => typeof(T)
+            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+    // <summary>
+    /// Gets PropertyInfo of a non public instance field.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns>An array of <see cref="FieldInfo"/></returns>
+    protected FieldInfo? GetNonPublicInstanceField<T>(string fieldName)
+        => typeof(T)
+            .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+
+    /// <summary>
     /// Gets an IEnumerable<string> of public instance property names.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -61,6 +79,14 @@ public abstract class BaseTestService
         => typeof(T)
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
             .Where(field => field.IsLiteral && !field.IsInitOnly);
+
+    /// <summary>
+    /// Gets MethodInfo of a public instance method.
+    /// </summary>
+    /// <returns>An array of <see cref="MethodInfo"/></returns>
+    protected MethodInfo? GetPublicInstanceMethod<T>(string methodName)
+        => typeof(T)
+            .GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
 
     /// <summary>
     /// Gets MethodInfo of a nonpublic instance method.

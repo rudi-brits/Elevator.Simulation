@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Otis.Sim.Configuration.Services;
 using Otis.Sim.Elevator.Services;
+using Otis.Sim.Interface.Interfaces;
+using Otis.Sim.Interface.Models;
 using Otis.Sim.Interface.Services;
 using Otis.Sim.MappingProfiles;
 
@@ -11,7 +13,7 @@ public class OtisSimulationService
 {
     const string successPrefix = "Success - ";
 
-    private ServiceProvider _serviceProvider;
+    private ServiceProvider? _serviceProvider;
 
     public OtisSimulationService()
     {
@@ -64,6 +66,7 @@ public class OtisSimulationService
             serviceCollection.AddSingleton(mapper);
             serviceCollection.AddSingleton<OtisConfigurationService>();
             serviceCollection.AddSingleton<ElevatorControllerService>();
+            serviceCollection.AddSingleton<ISimTerminalGuiApplication, SimTerminalGuiApplication>();
             serviceCollection.AddSingleton<TerminalUiService>();
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
@@ -80,8 +83,8 @@ public class OtisSimulationService
     {
         try
         {
-            var otisConfigurationService = _serviceProvider.GetService<OtisConfigurationService>();
-            otisConfigurationService.LoadConfiguration();
+            var otisConfigurationService = _serviceProvider?.GetService<OtisConfigurationService>();
+            otisConfigurationService?.LoadConfiguration();
 
             Console.WriteLine(LoadAppConfigurationMessage());
         }
@@ -95,8 +98,8 @@ public class OtisSimulationService
     {
         try
         {
-            var elevatorControllerService = _serviceProvider.GetService<ElevatorControllerService>();
-            elevatorControllerService.LoadConfiguration();
+            var elevatorControllerService = _serviceProvider?.GetService<ElevatorControllerService>();
+            elevatorControllerService?.LoadConfiguration();
 
             Console.WriteLine(LoadElevatorControllerConfigurationMessage());
         }
@@ -110,8 +113,8 @@ public class OtisSimulationService
     {
         try
         { 
-            var terminalUiService = _serviceProvider.GetService<TerminalUiService>();
-            terminalUiService.InitialiseUi();
+            var terminalUiService = _serviceProvider?.GetService<TerminalUiService>();
+            terminalUiService?.InitialiseUi();
         }
         catch (Exception exc)
         {
