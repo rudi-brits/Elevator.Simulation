@@ -1,46 +1,15 @@
 ﻿using AutoMapper;
 using Moq;
 using Otis.Sim.Configuration.Services;
+using Otis.Sim.Elevator.Models;
 using Otis.Sim.Elevator.Services;
 using Otis.Sim.Interface.Interfaces;
 using Otis.Sim.Interface.Services;
+using Otis.Sim.Unit.Tests.Otis.Sim.Interface.MockClasses;
+using System.Reflection;
 using Terminal.Gui;
 
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Interface.Services;
-
-public class TerminalUiServiceMock : TerminalUiService
-{
-    public bool CalledSetOriginFloorInputFocus = false;
-    public bool CalledProcessRequest = false;
-    public bool CalledCreateElevatorTable = false;
-    public bool CalledInitialiseTableDataRefresh = false;
-
-    public TerminalUiServiceMock(ISimTerminalGuiApplication terminalGuiApplication, 
-        ElevatorControllerService elevatorControllerService) 
-            : base(terminalGuiApplication, elevatorControllerService)
-    {
-    }
-
-    protected override void SetOriginFloorInputFocus()
-    {
-        CalledSetOriginFloorInputFocus = true;
-    }
-
-    protected override void ProcessRequest()
-    {
-        CalledProcessRequest = true;
-    }
-
-    protected override void CreateElevatorTable()
-    {
-        CalledCreateElevatorTable = true;
-    }
-
-    protected override void InitialiseTableDataRefresh()
-    {
-        CalledInitialiseTableDataRefresh = true;
-    }
-}
 
 /// <summary>
 /// Class TerminalUiServiceTests extends the <see cref="InterfaceTests" /> class.
@@ -175,6 +144,50 @@ public class TerminalUiServiceTests : InterfaceTests
     }
 
     /// <summary>
+    /// Test ProcessRequest for success and fail.
+    /// </summary>
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ProcessRequest_ShowSuccessMessage(bool success)
+    {
+        var newTextField = new TextField("");
+        var originFloorInput      = GetNonPublicInstanceProperty<TerminalUiService>("_originFloorInput");
+        var destinationFloorInput = GetNonPublicInstanceProperty<TerminalUiService>("_destinationFloorInput");
+        var capacityInput         = GetNonPublicInstanceProperty<TerminalUiService>("_capacityInput");
+
+        originFloorInput?.SetValue(_mockTerminalUiService, newTextField);
+        destinationFloorInput?.SetValue(_mockTerminalUiService, newTextField);
+        capacityInput?.SetValue(_mockTerminalUiService, newTextField);
+
+        var response = new ElevatorRequestResult { Success = success };
+        _mockElevatorControllerService
+            .Setup(x => x.RequestElevator(It.IsAny<UserInputRequest>()))
+            .Returns(response);
+
+        var methodInfo = GetNonPublicInstanceMethod<TerminalUiService>("ProcessRequest");
+        Assert.That(methodInfo, Is.Not.Null);
+
+        _mockTerminalUiService.CallBaseProcessRequest = true;
+        methodInfo.Invoke(_mockTerminalUiService, null);
+
+        Assert.That(_mockTerminalUiService.CalledSetOriginFloorInputFocus, Is.True);
+
+        if (success)
+        {
+            Assert.That(_mockTerminalUiService.CalledShowSuccessMessageBox, Is.True);
+
+            Assert.That(GetTextFieldStringValue(originFloorInput), Is.EqualTo(string.Empty));
+            Assert.That(GetTextFieldStringValue(destinationFloorInput), Is.EqualTo(string.Empty));
+            Assert.That(GetTextFieldStringValue(capacityInput), Is.EqualTo(string.Empty));
+        } 
+        else
+        {
+            Assert.That(_mockTerminalUiService.CalledShowErrorMessageBox, Is.True);
+        }
+    }
+
+    /// <summary>
     /// Method to test nonpublic property value not null.
     /// </summary>
     /// <param name="propertyName"></param>
@@ -186,4 +199,12 @@ public class TerminalUiServiceTests : InterfaceTests
         var value = property.GetValue(_mockTerminalUiService);
         Assert.That(value, Is.Not.Null);
     }
+
+    /// <summary>
+    /// Get the string value from PropertyInfo of a TextField object.
+    /// </summary>
+    /// <param name="propertyInfo"></param>
+    /// <returns></returns>
+    private string? GetTextFieldStringValue(PropertyInfo? propertyInfo)
+        => (propertyInfo?.GetValue(_mockTerminalUiService) as TextField)?.Text?.ToString();
 }

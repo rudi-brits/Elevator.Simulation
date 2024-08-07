@@ -218,22 +218,22 @@ public class TerminalUiService : ConsoleFullScreenService
             _destinationFloorInput.Text = string.Empty;
             _capacityInput.Text         = string.Empty;
 
-            showSuccessMessageBox("The request has been queued");
+            ShowSuccessMessageBox("The request has been queued");
         }
         else
         {
-            showErrorMessageBox(response.Message);
+            ShowErrorMessageBox(response.Message);
         }
 
         SetOriginFloorInputFocus();
     }
 
-    protected void showSuccessMessageBox(string message)
+    protected virtual void ShowSuccessMessageBox(string message)
     {
         MessageBox.Query("Success", message, "Ok");
     }
 
-    protected void showErrorMessageBox(string message)
+    protected virtual void ShowErrorMessageBox(string message)
     {
         MessageBox.ErrorQuery("Error", message, "Ok");
     }

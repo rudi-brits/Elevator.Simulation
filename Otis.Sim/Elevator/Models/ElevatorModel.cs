@@ -104,6 +104,17 @@ namespace Otis.Sim.Elevator.Models
         private bool IsFloorInRange(int floor) =>
             floor.IsInRange(LowestFloor, HighestFloor);
 
+        private bool IsSameDirectionOnRoute(int requestOriginFloor, ElevatorDirection requestDirection)
+        {
+            if (requestDirection == ElevatorDirection.Up)
+                return requestOriginFloor > CurrentFloor;
+
+            if (requestDirection == ElevatorDirection.Down)
+                return requestOriginFloor < CurrentFloor;
+
+            return false;
+        }
+
         private bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
         {
             var targetQueue = _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
@@ -122,24 +133,7 @@ namespace Otis.Sim.Elevator.Models
             if (_currentDirection != direction)
                 return false;
 
-            if (direction == ElevatorDirection.Up)
-                return originFloor > CurrentFloor;
-
-            else if (direction == ElevatorDirection.Down)
-                return originFloor < CurrentFloor;
-
-            return false;
-        }
-
-        private bool IsSameDirectionOnRoute(int requestOriginFloor, ElevatorDirection requestDirection)
-        {
-            if (requestDirection == ElevatorDirection.Up)
-                return requestOriginFloor > CurrentFloor;
-
-            if (requestDirection == ElevatorDirection.Down)
-                return requestOriginFloor < CurrentFloor;
-
-            return false;
+            return IsSameDirectionOnRoute(originFloor, direction);
         }
 
         public bool AcceptRequest(ElevatorRequest request)
@@ -148,12 +142,9 @@ namespace Otis.Sim.Elevator.Models
             {
                 if (CurrentStatus == ElevatorStatus.Idle)
                 {
-                    var primaryDirectionDown = CurrentFloor > request.OriginFloor && request.Direction == ElevatorDirection.Down;
-                    var primaryDirectionUp   = CurrentFloor < request.OriginFloor && request.Direction == ElevatorDirection.Up;
-
                     _primaryDirectionQueue.Add(request.OriginFloor);
 
-                    if (primaryDirectionDown || primaryDirectionUp)
+                    if (IsSameDirectionOnRoute(request.OriginFloor, request.Direction))
                         _primaryDirectionQueue.Add(request.DestinationFloor);
                     else
                         _secondaryDirectionQueue.Add(request.DestinationFloor);

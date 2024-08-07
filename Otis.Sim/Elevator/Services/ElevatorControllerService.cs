@@ -45,7 +45,7 @@ namespace Otis.Sim.Elevator.Services
             _requestConsumerTask.Wait();
         }
 
-        public ElevatorRequestResult RequestElevator(UserInputRequest userInputRequest)
+        public virtual ElevatorRequestResult RequestElevator(UserInputRequest userInputRequest)
         {
             var userInputValidationResult = ValidateUserInputRequest(userInputRequest);
             if (userInputValidationResult != null)
