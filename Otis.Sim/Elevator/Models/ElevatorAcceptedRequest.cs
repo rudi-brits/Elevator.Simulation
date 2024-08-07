@@ -26,10 +26,10 @@ public class ElevatorAcceptedRequest : ElevatorRequestBase
            $"{OtisSimConstants.Capacity}: {capacity}, ";
 
     public string ToCompletedRequestString()
-        => ToStatusString("Completed");
+        => ToStatusString(OtisSimConstants.Completed);
 
     public string ToRequeuedRequestString()
-        => ToStatusString("Requeued");
+        => ToStatusString(OtisSimConstants.Requeued);
 
     private string ToStatusString(string status)
     {

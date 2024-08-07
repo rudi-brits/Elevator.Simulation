@@ -35,6 +35,10 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
     {
         var elevatorRequest = new ElevatorAcceptedRequest();
 
+        Assert.That(elevatorRequest.Id, Is.EqualTo(Guid.Empty));
+        Assert.That(elevatorRequest.OriginFloor, Is.EqualTo(0));
+        Assert.That(elevatorRequest.DestinationFloor, Is.EqualTo(0));
+        Assert.That(elevatorRequest.NumberOfPeople, Is.EqualTo(0));
         Assert.That(elevatorRequest.ElevatorName, Is.EqualTo(string.Empty));
         Assert.That(elevatorRequest.RequestDirection, Is.EqualTo(ElevatorDirection.Up));
         Assert.That(elevatorRequest.OriginFloorServiced, Is.EqualTo(false));
@@ -81,6 +85,25 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
             : _elevatorAcceptedRequest.ToDroppedOffRequestString(numberOfPeople, capacity);
 
         ValidateToString(requestString, $"{ElevatorStatus.DoorsOpen} ({status})");
+
+        StringAssert.Contains(
+            $"{OtisSimConstants.PeopleName}: {numberOfPeople}, ", requestString);
+        StringAssert.Contains(
+            $"{OtisSimConstants.Capacity}: {capacity}, ", requestString);
+    }
+
+    [Test]
+    public void Validate_ToCompletedRequestString()
+    {
+        var completedRequestString = _elevatorAcceptedRequest.ToCompletedRequestString();
+        ValidateToString(completedRequestString, OtisSimConstants.Completed);
+    }
+
+    [Test]
+    public void Validate_ToRequeuedRequestString()
+    {
+        var requeuedRequestString = _elevatorAcceptedRequest.ToRequeuedRequestString();
+        ValidateToString(requeuedRequestString, OtisSimConstants.Requeued);
     }
 
     private void ValidateToString(string value, string status)

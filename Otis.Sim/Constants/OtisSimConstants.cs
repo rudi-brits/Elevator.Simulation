@@ -49,4 +49,12 @@ public class OtisSimConstants
     /// Drop off string constant
     /// </summary>
     public const string DropOff              = "Drop off";
+    /// <summary>
+    /// Completed string constant
+    /// </summary>
+    public const string Completed            = "Completed";
+    /// <summary>
+    /// Requeued string constant
+    /// </summary>
+    public const string Requeued             = "Requeued";
 }
