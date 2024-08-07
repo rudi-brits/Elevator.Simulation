@@ -171,7 +171,7 @@ namespace Otis.Sim.Elevator.Services
                 .ForEach(result =>
                 {
                     Debug.WriteLine($"{result.Elevator.Description}, Status: {result.Elevator.CurrentStatus}, " +
-                        $"Capacity: {result.Elevator.Capacity}, CurrentFloor: {result.Elevator.CurrentFloor}, " +
+                        $"OtisSimConstants.Capacity: {result.Elevator.Capacity}, CurrentFloor: {result.Elevator.CurrentFloor}, " +
                         $"Request from: {request.OriginFloor}, Request to: {request.DestinationFloor}, " +
                         $"Request direction: {request.Direction}, " + 
                         $"Distance: {result.Distance}");

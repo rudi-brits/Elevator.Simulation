@@ -29,4 +29,24 @@ public class OtisSimConstants
     /// Zero string constant
     /// </summary>
     public const string Zero                 = "Zero";
+    /// <summary>
+    /// Status string constant
+    /// </summary>
+    public const string Status               = "Status";
+    /// <summary>
+    /// Accepted string constant
+    /// </summary>
+    public const string Accepted             = "Accepted";
+    /// <summary>
+    /// Capacity string constant
+    /// </summary>
+    public const string Capacity             = "Capacity";
+    /// <summary>
+    /// Pick up string constant
+    /// </summary>
+    public const string PickUp               = "Pick up";
+    /// <summary>
+    /// Drop off string constant
+    /// </summary>
+    public const string DropOff              = "Drop off";
 }

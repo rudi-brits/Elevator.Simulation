@@ -22,8 +22,4 @@
     <ProjectReference Include="..\Otis.Sim\Otis.Sim.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Otis.Sim\Elevator\Models\" />
-  </ItemGroup>
-
 </Project>

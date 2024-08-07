@@ -54,7 +54,7 @@ namespace Otis.Sim.Elevator.Models
                 $"{OtisSimConstants.OriginFloorName}: {OriginFloor}, " + 
                 $"{OtisSimConstants.DestinationFloorName}: {DestinationFloor}, " + 
                 $"{OtisSimConstants.PeopleName}: {NumberOfPeople}, " +
-                $"Status: {RequestStatus}, " +
+                $"{OtisSimConstants.Status}: {RequestStatus}, " +
                 $"{nameof(Direction)}: {Direction}";
         }
     }
