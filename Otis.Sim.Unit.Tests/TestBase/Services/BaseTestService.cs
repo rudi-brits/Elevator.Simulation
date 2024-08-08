@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using AutoMapper;
+using Otis.Sim.MappingProfiles;
+using System.Reflection;
 
 namespace Otis.Sim.Unit.Tests.TestBase.Services;
 
@@ -7,6 +9,18 @@ namespace Otis.Sim.Unit.Tests.TestBase.Services;
 /// </summary>
 public abstract class BaseTestService
 {
+    protected IMapper SetupIMapper()
+    {
+        var configuration = new MapperConfiguration(config =>
+        {
+            config.AddProfile<OtisMappingProfile>();
+        });
+
+        var mapper = new Mapper(configuration);
+
+        return mapper;
+    }
+
     /// <summary>
     /// Gets a PropertyInfo[] of public instance properties.
     /// </summary>

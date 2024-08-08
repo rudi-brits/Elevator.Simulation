@@ -60,4 +60,20 @@ public class SimTerminalGuiApplicationTests : InterfaceTests
         application.Run();
         _mockSimTerminalGuiApplication.Verify(x => x.Run(), Times.Once);
     }
+
+    /// <summary>
+    /// TestInvoke.
+    /// </summary>
+    [Test]
+    public void ShouldRun_Invoke()
+    {
+        var application = _mockSimTerminalGuiApplication.Object;
+        var action = new Action(() =>
+        {
+            Console.WriteLine(nameof(ShouldRun_Invoke));
+        });
+
+        application.Invoke(action);
+        _mockSimTerminalGuiApplication.Verify(x => x.Invoke(It.IsAny<Action>()), Times.Once);
+    }
 }

@@ -9,9 +9,18 @@ namespace Otis.Sim.Unit.Tests.Otis.Sim.Elevator.Models;
 /// </summary>
 public class ElevatorAcceptedRequestTests : ElevatorTests
 {
+    /// <summary>
+    /// _id field for the ElevatorAcceptedRequest instance.
+    /// </summary>
     private Guid _id;
+    /// <summary>
+    /// ElevatorAcceptedRequest field.
+    /// </summary>
     private ElevatorAcceptedRequest _elevatorAcceptedRequest;
 
+    /// <summary>
+    /// OneTimeSetUp of mocks and services.
+    /// </summary>
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
@@ -30,6 +39,9 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
         };
     }
 
+    /// <summary>
+    /// Validate default initialisation values.
+    /// </summary>
     [Test]
     public void Validate_DefaultValues()
     {
@@ -46,6 +58,9 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
         Assert.That(elevatorRequest.Completed, Is.EqualTo(false));
     }
 
+    /// <summary>
+    /// Validate the Completed calculed field.
+    /// </summary>
     [Test]
     [TestCase(true, true)]
     [TestCase(false, false)]
@@ -65,6 +80,9 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
             Assert.That(elevatorRequest.Completed, Is.EqualTo(false));
     }
 
+    /// <summary>
+    /// Valiadate the ToAcceptedRequestString function.
+    /// </summary>
     [Test]
     public void Validate_ToAcceptedRequestString()
     {
@@ -72,6 +90,9 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
         ValidateToString(acceptedRequestString, OtisSimConstants.Accepted);
     }
 
+    /// <summary>
+    /// Valiadate the ToPickedUpRequestString & ToDroppedOffRequestString functions.
+    /// </summary>
     [Test]
     [TestCase(OtisSimConstants.PickUp)]
     [TestCase(OtisSimConstants.DropOff)]
@@ -92,6 +113,9 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
             $"{OtisSimConstants.Capacity}: {capacity}, ", requestString);
     }
 
+    /// <summary>
+    /// Valiadate the ToCompletedRequestString function.
+    /// </summary>
     [Test]
     public void Validate_ToCompletedRequestString()
     {
@@ -99,6 +123,9 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
         ValidateToString(completedRequestString, OtisSimConstants.Completed);
     }
 
+    /// <summary>
+    /// Valiadate the ToRequeuedRequestString function.
+    /// </summary>
     [Test]
     public void Validate_ToRequeuedRequestString()
     {
@@ -106,6 +133,9 @@ public class ElevatorAcceptedRequestTests : ElevatorTests
         ValidateToString(requeuedRequestString, OtisSimConstants.Requeued);
     }
 
+    /// <summary>
+    /// Valiadate generic results.
+    /// </summary>
     private void ValidateToString(string value, string status)
     {
         StringAssert.Contains(

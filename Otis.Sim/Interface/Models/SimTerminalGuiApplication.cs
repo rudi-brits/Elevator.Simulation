@@ -27,4 +27,11 @@ public class SimTerminalGuiApplication : ISimTerminalGuiApplication
     {
         TerminalGuiApplication.Run();
     }
+    /// <summary>
+    /// Invoke function for MainLoop.
+    /// </summary>
+    public void Invoke(Action action)
+    {
+        TerminalGuiApplication.MainLoop.Invoke(action);
+    }
 }

@@ -19,4 +19,8 @@ public interface ISimTerminalGuiApplication
     /// Run function.
     /// </summary>
     void Run();
+    /// <summary>
+    /// Invoke function for MainLoop.
+    /// </summary>
+    void Invoke(Action action);
 }

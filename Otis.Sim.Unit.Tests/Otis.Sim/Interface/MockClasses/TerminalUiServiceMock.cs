@@ -30,6 +30,14 @@ public class TerminalUiServiceMock : TerminalUiService
     /// </summary>
     public bool CalledCreateElevatorTable = false;
     /// <summary>
+    /// CalledUpdateDataTable field.
+    /// </summary>
+    public bool CalledUpdateDataTable = false;
+    /// <summary>
+    /// CalledAddElevatorRows field.
+    /// </summary>
+    public bool CalledAddElevatorRows = false;
+    /// <summary>
     /// CalledInitialiseTableDataRefresh field.
     /// </summary>
     public bool CalledInitialiseTableDataRefresh = false;
@@ -38,6 +46,23 @@ public class TerminalUiServiceMock : TerminalUiService
     /// CallBaseProcessRequest field.
     /// </summary>
     public bool CallBaseProcessRequest = false;
+
+    /// <summary>
+    /// CallBaseCreateElevatorTable field.
+    /// </summary>
+    public bool CallBaseCreateElevatorTable = false;
+    /// <summary>
+    /// CallBaseCreateElevatorTable field.
+    /// </summary>
+    public bool CallBaseUpdateDataTable = false;
+    /// <summary>
+    /// CallBaseCreateElevatorTable field.
+    /// </summary>
+    public bool CallBaseElevatorRows = false;
+    /// <summary>
+    /// CallBaseCreateElevatorTable field.
+    /// </summary>
+    public bool CallBaseInitialiseTableDataRefresh = false;
 
     /// <summary>
     /// TerminalUiServiceMock constructor
@@ -92,6 +117,28 @@ public class TerminalUiServiceMock : TerminalUiService
     protected override void CreateElevatorTable()
     {
         CalledCreateElevatorTable = true;
+        if (CallBaseCreateElevatorTable)
+            base.CreateElevatorTable();
+    }
+
+    /// <summary>
+    /// UpdateDataTable function.
+    /// </summary>
+    protected override void UpdateDataTable()
+    {
+        CalledUpdateDataTable = true;
+        if (CallBaseUpdateDataTable)
+            base.UpdateDataTable();
+    }
+
+    /// <summary>
+    /// AddElevatorRows function.
+    /// </summary>
+    protected override void AddElevatorRows()
+    {
+        CalledAddElevatorRows = true;
+        if (CallBaseElevatorRows)
+            base.AddElevatorRows();
     }
 
     /// <summary>
@@ -100,5 +147,7 @@ public class TerminalUiServiceMock : TerminalUiService
     protected override void InitialiseTableDataRefresh()
     {
         CalledInitialiseTableDataRefresh = true;
+        if (CallBaseInitialiseTableDataRefresh)
+            base.InitialiseTableDataRefresh();
     }
 }

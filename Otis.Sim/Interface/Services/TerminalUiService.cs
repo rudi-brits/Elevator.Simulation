@@ -2,6 +2,7 @@
 using Otis.Sim.Elevator.Models;
 using Otis.Sim.Elevator.Services;
 using Otis.Sim.Interface.Interfaces;
+using Otis.Sim.Utilities.Constants;
 using System.Data;
 using Terminal.Gui;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
@@ -9,22 +10,63 @@ using UiConstants = Otis.Sim.Interface.Constants.TerminalUiConstants;
 
 namespace Otis.Sim.Interface.Services;
 
+/// <summary>
+/// TerminalUiService class extends the <see cref="ConsoleFullScreenService" /> class.
+/// </summary>
 public class TerminalUiService : ConsoleFullScreenService
 {
+    /// <summary>
+    /// _globalColorScheme
+    /// </summary>
     private ColorScheme? _globalColorScheme { get; set; }
+    /// <summary>
+    /// _idleColorScheme
+    /// </summary>
     private ColorScheme? _idleColorScheme { get; set; }
+    /// <summary>
+    /// _requestStatusView
+    /// </summary>
     private TextView? _requestStatusView { get; set; }
+    /// <summary>
+    /// _elevatorsTableView
+    /// </summary>
     private TableView? _elevatorsTableView { get; set; }
+    /// <summary>
+    /// _originFloorInput
+    /// </summary>
     private TextField? _originFloorInput { get; set; }
+    /// <summary>
+    /// _destinationFloorInput
+    /// </summary>
     private TextField? _destinationFloorInput { get; set; }
+    /// <summary>
+    /// _capacityInput
+    /// </summary>
     private TextField? _capacityInput { get; set; }
 
+    /// <summary>
+    /// _refreshDataThread
+    /// </summary>
     private Thread? _refreshDataThread;
+    /// <summary>
+    /// _cancellationTokenSource
+    /// </summary>
     private CancellationTokenSource? _cancellationTokenSource;
 
+    /// <summary>
+    /// _terminalGuiApplication
+    /// </summary>
     private readonly ISimTerminalGuiApplication _terminalGuiApplication;
+    /// <summary>
+    /// _elevatorControllerService
+    /// </summary>
     private readonly ElevatorControllerService _elevatorControllerService;
 
+    /// <summary>
+    /// TerminalUiService constructor
+    /// </summary>
+    /// <param name="terminalGuiApplication"></param>
+    /// <param name="elevatorControllerService"></param>
     public TerminalUiService(ISimTerminalGuiApplication terminalGuiApplication,
         ElevatorControllerService elevatorControllerService)
     {
@@ -33,6 +75,9 @@ public class TerminalUiService : ConsoleFullScreenService
         _elevatorControllerService.UpdateRequestStatus = UpdateRequestStatus;
     }
 
+    /// <summary>
+    /// InitialiseUi function
+    /// </summary>
     public void InitialiseUi()
     {
         InitialiseColorSchemes();
@@ -40,6 +85,9 @@ public class TerminalUiService : ConsoleFullScreenService
         InitialiseApplication();
     }
 
+    /// <summary>
+    /// InitialiseColorSchemes function
+    /// </summary>
     private void InitialiseColorSchemes()
     {
         _globalColorScheme = new ColorScheme()
@@ -56,6 +104,9 @@ public class TerminalUiService : ConsoleFullScreenService
         };
     }
 
+    /// <summary>
+    /// InitialiseApplication function
+    /// </summary>
     protected virtual void InitialiseApplication()
     {
         _terminalGuiApplication.Init();
@@ -196,11 +247,17 @@ public class TerminalUiService : ConsoleFullScreenService
         _terminalGuiApplication.Run();
     }
 
+    /// <summary>
+    /// SetOriginFloorInputFocus function
+    /// </summary>
     protected virtual void SetOriginFloorInputFocus()
     {
         _originFloorInput?.SetFocus();
     }
 
+    /// <summary>
+    /// ProcessRequest function
+    /// </summary>
     protected virtual void ProcessRequest()
     { 
         var request = new UserInputRequest
@@ -228,16 +285,27 @@ public class TerminalUiService : ConsoleFullScreenService
         SetOriginFloorInputFocus();
     }
 
+    /// <summary>
+    /// ShowSuccessMessageBox function
+    /// </summary>
+    /// <param name="message"></param>
     protected virtual void ShowSuccessMessageBox(string message)
     {
         MessageBox.Query("Success", message, "Ok");
     }
 
+    /// <summary>
+    /// ShowErrorMessageBox function
+    /// </summary>
+    /// <param name="message"></param>
     protected virtual void ShowErrorMessageBox(string message)
     {
         MessageBox.ErrorQuery("Error", message, "Ok");
     }
 
+    /// <summary>
+    /// CreateElevatorTable function
+    /// </summary>
     protected virtual void CreateElevatorTable()
     {
         _elevatorsTableView!.Table = new DataTable();
@@ -266,14 +334,20 @@ public class TerminalUiService : ConsoleFullScreenService
         _elevatorsTableView.SetNeedsDisplay(); 
     }
 
-    private void UpdateDataTable()
+    /// <summary>
+    /// UpdateDataTable function
+    /// </summary>
+    protected virtual void UpdateDataTable()
     {
         _elevatorsTableView!.Table.Rows.Clear();
         AddElevatorRows();
         _elevatorsTableView.SetNeedsDisplay();
     }
 
-    private void AddElevatorRows()
+    /// <summary>
+    /// AddElevatorRows function
+    /// </summary>
+    protected virtual void AddElevatorRows()
     {
         _elevatorControllerService.ElevatorDataRows.ForEach(dataRow =>
         {
@@ -288,9 +362,12 @@ public class TerminalUiService : ConsoleFullScreenService
         });
     }
 
+    /// <summary>
+    /// InitialiseTableDataRefresh function
+    /// </summary>
     protected virtual void InitialiseTableDataRefresh()
     {
-        _cancellationTokenSource = new CancellationTokenSource();
+        _cancellationTokenSource            = new CancellationTokenSource();
         CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
         _refreshDataThread = new Thread(() =>
@@ -299,8 +376,8 @@ public class TerminalUiService : ConsoleFullScreenService
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    Thread.Sleep(1000);
-                    Application.MainLoop.Invoke(() =>
+                    Thread.Sleep(750);
+                    _terminalGuiApplication.Invoke(() =>
                     {
                         UpdateDataTable();
                     });
@@ -315,13 +392,17 @@ public class TerminalUiService : ConsoleFullScreenService
         _refreshDataThread.Start();
     }
 
-    private void UpdateRequestStatus(string message)
+    /// <summary>
+    /// UpdateRequestStatus function
+    /// </summary>
+    /// <param name="message"></param>
+    protected virtual void UpdateRequestStatus(string message)
     {
-        Application.MainLoop.Invoke(() =>
+        _terminalGuiApplication.Invoke(() =>
         {
             if (_requestStatusView != null)
             {
-                _requestStatusView.Text = $"{message}\n{_requestStatusView.Text}";
+                _requestStatusView.Text = $"{message}{UtilityConstants.NewLineCharacter}{_requestStatusView.Text}";
             }
         });
     }

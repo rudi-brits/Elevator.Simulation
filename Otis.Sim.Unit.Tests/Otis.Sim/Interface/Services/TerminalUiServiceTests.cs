@@ -6,6 +6,7 @@ using Otis.Sim.Elevator.Services;
 using Otis.Sim.Interface.Interfaces;
 using Otis.Sim.Interface.Services;
 using Otis.Sim.Unit.Tests.Otis.Sim.Interface.MockClasses;
+using Otis.Sim.Utilities.Constants;
 using System.Reflection;
 using Terminal.Gui;
 
@@ -19,7 +20,7 @@ public class TerminalUiServiceTests : InterfaceTests
     /// <summary>
     /// Mock<IMapper> field.
     /// </summary>
-    private Mock<IMapper> _mapper;
+    private IMapper _mapper;
     /// <summary>
     /// Mock<OtisConfigurationService> field.
     /// </summary>
@@ -43,17 +44,18 @@ public class TerminalUiServiceTests : InterfaceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _mapper = new Mock<IMapper>();
+        _mapper = SetupIMapper();
 
         _mockConfigurationService = new Mock<OtisConfigurationService>();
         _mockElevatorControllerService = new Mock<ElevatorControllerService>(
-            _mockConfigurationService.Object, _mapper.Object);
+            _mockConfigurationService.Object, _mapper);
 
         _mockTerminalGuiApplication = new Mock<ISimTerminalGuiApplication>();
         _mockTerminalGuiApplication.Setup(x => x.Init()).Verifiable();
         _mockTerminalGuiApplication.Setup(x => x.Top).Returns(new Toplevel());
         _mockTerminalGuiApplication.Setup(x => x.Run()).Verifiable();
-    }
+        _mockTerminalGuiApplication.Setup(x => x.Invoke(It.IsAny<Action>())).Callback<Action>(a => a.Invoke());
+    }   
 
     /// <summary>
     /// SetUp before each test.
@@ -188,6 +190,152 @@ public class TerminalUiServiceTests : InterfaceTests
     }
 
     /// <summary>
+    /// Test the CreateElevatorTable function.
+    /// </summary>
+    [Test]
+    public void CreateElevatorTable_Success()
+    {
+        SetupTableColumns();
+    }
+
+    /// <summary>
+    /// Test the UpdateDataTable function.
+    /// </summary>
+    [Test]
+    public void UpdateDataTable_Success()
+    {
+        var elevatorsTableView = SetupTableRows();
+
+        var methodInfo = GetNonPublicInstanceMethod<TerminalUiService>("UpdateDataTable");
+        Assert.That(methodInfo, Is.Not.Null);
+
+        _mockTerminalUiService.CallBaseElevatorRows = false;
+        _mockTerminalUiService.CallBaseUpdateDataTable = true;
+        methodInfo.Invoke(_mockTerminalUiService, null);
+
+        var tableRowCount = GetElevatorsTableViewRowCount(elevatorsTableView);
+
+        Assert.That(tableRowCount, Is.EqualTo(0));
+    }
+
+    /// <summary>
+    /// Test the AddElevatorRows function.
+    /// </summary>
+    [Test]
+    public void AddElevatorRows_Success()
+    {
+        SetupTableRows();
+    }
+
+    /// <summary>
+    /// UpdateRequestStatus with message text.
+    /// </summary>
+    /// <param name="numberOfMessages"></param>
+    /// <param name="statusViewIsNotNull"></param>
+    [Test]
+    [TestCase(1, true)]
+    [TestCase(15, true)]
+    [TestCase(1, false)]
+    [TestCase(15, false)]
+    public void UpdateRequestStatus_Success(int numberOfMessages, bool statusViewIsNotNull)
+    {
+        var requestStatusView = GetNonPublicInstanceProperty<TerminalUiService>("_requestStatusView");
+        Assert.That(requestStatusView, Is.Not.Null);
+
+        if (statusViewIsNotNull)
+            requestStatusView!.SetValue(_mockTerminalUiService, new TextView());
+
+        var methodInfo = GetNonPublicInstanceMethod<TerminalUiService>("UpdateRequestStatus");
+        Assert.That(methodInfo, Is.Not.Null);
+
+        var expectedText = string.Empty;
+        Assert.DoesNotThrow(() =>
+        {
+            for (var i = 0; i < numberOfMessages; i++)
+            {
+                var message = $"Message {i + 1}";
+                methodInfo.Invoke(_mockTerminalUiService, new object[] { message });
+                expectedText = $"{message}\r{UtilityConstants.NewLineCharacter}{expectedText}";
+            }
+        });
+
+        if (!statusViewIsNotNull)
+            return;
+
+        var textValue = ((requestStatusView?.GetValue(_mockTerminalUiService)) as TextView)?.Text;
+        Assert.That(textValue, Is.Not.Null);
+        Assert.That(textValue.ToString(), Is.EqualTo(expectedText));
+    }
+
+    /// <summary>
+    /// Ensure that the thread is started.
+    /// </summary>
+    [Test]
+    public void InitialiseTableDataRefresh_StartThread()
+    {
+        SetupInitialiseTableDataRefresh();
+
+        var threadValue = GetRefreshDataThreadValue();
+        Assert.That(threadValue.IsAlive, Is.True);
+    }
+
+    /// <summary>
+    /// Ensure that CalledUpdateDataTable was called.
+    /// </summary>
+    [Test]
+    public void InitialiseTableDataRefresh_UpdateDataTable_WasInvoked()
+    {
+        SetupInitialiseTableDataRefresh();
+
+        Thread.Sleep(1200);
+        Assert.That(_mockTerminalUiService.CalledUpdateDataTable, Is.True);
+    }
+
+    /// <summary>
+    /// Ensure that the thread is cancelled.
+    /// </summary>
+    [Test]
+    public void InitialiseTableDataRefresh_CancelThread()
+    {
+        SetupInitialiseTableDataRefresh();
+
+        var cancellationTokenSource = GetNonPublicInstanceField<TerminalUiService>("_cancellationTokenSource");
+        Assert.That(cancellationTokenSource, Is.Not.Null);
+
+        (cancellationTokenSource.GetValue(_mockTerminalUiService) as CancellationTokenSource)?.Cancel();
+
+        var threadValue = GetRefreshDataThreadValue();
+        threadValue.Join();
+
+        Assert.That(threadValue.IsAlive, Is.False);
+    }
+
+    /// <summary>
+    /// Setup InitialiseTableDataRefresh
+    /// </summary>
+    private void SetupInitialiseTableDataRefresh()
+    {
+        var methodInfo = GetNonPublicInstanceMethod<TerminalUiService>("InitialiseTableDataRefresh");
+        Assert.That(methodInfo, Is.Not.Null);
+
+        _mockTerminalUiService.CallBaseUpdateDataTable = true;
+        _mockTerminalUiService.CallBaseInitialiseTableDataRefresh = true;
+
+        methodInfo.Invoke(_mockTerminalUiService, null);
+    }
+
+    private Thread GetRefreshDataThreadValue()
+    {
+        var refreshDataThreadField = GetNonPublicInstanceField<TerminalUiService>("_refreshDataThread");
+        Assert.That(refreshDataThreadField, Is.Not.Null);
+
+        var threadValue = (refreshDataThreadField?.GetValue(_mockTerminalUiService)) as Thread;
+        Assert.That(threadValue, Is.Not.Null);
+
+        return threadValue;
+    }
+
+    /// <summary>
     /// Method to test nonpublic property value not null.
     /// </summary>
     /// <param name="propertyName"></param>
@@ -207,4 +355,72 @@ public class TerminalUiServiceTests : InterfaceTests
     /// <returns></returns>
     private string? GetTextFieldStringValue(PropertyInfo? propertyInfo)
         => (propertyInfo?.GetValue(_mockTerminalUiService) as TextField)?.Text?.ToString();
+
+    /// <summary>
+    /// Setup the elevatorsTableView,
+    /// </summary>
+    /// <returns></returns>
+    private PropertyInfo? SetupElevatorsTableView()
+    {
+        var elevatorsTableView = GetNonPublicInstanceProperty<TerminalUiService>("_elevatorsTableView");
+        elevatorsTableView?.SetValue(_mockTerminalUiService, new TableView());
+        return elevatorsTableView;
+    }
+
+    /// <summary>
+    /// Setup the elevatorsTableView columns.
+    /// </summary>
+    private PropertyInfo? SetupTableColumns()
+    {
+        var elevatorsTableView = SetupElevatorsTableView();
+        Assert.That(elevatorsTableView, Is.Not.Null);
+
+        var methodInfo = GetNonPublicInstanceMethod<TerminalUiService>("CreateElevatorTable");
+        Assert.That(methodInfo, Is.Not.Null);
+
+        _mockTerminalUiService.CallBaseCreateElevatorTable = true;
+        methodInfo.Invoke(_mockTerminalUiService, null);
+
+        var tableColumns = (elevatorsTableView?.GetValue(_mockTerminalUiService) as TableView)?.Table?.Columns;
+        Assert.That(tableColumns, Is.Not.Null);
+        Assert.That(tableColumns?.Count, Is.EqualTo(_mockElevatorControllerService.Object.ElevatorTableHeaders.Count));
+
+        return elevatorsTableView;
+    }
+
+    /// <summary>
+    /// Setup the elevatorsTableView rows.
+    /// </summary>
+    private PropertyInfo? SetupTableRows()
+    {
+        var elevatorsTableView = SetupTableColumns();
+
+        var elevatorsField = GetNonPublicInstanceField<ElevatorControllerService>("_elevators");
+        Assert.That(elevatorsField, Is.Not.Null);
+
+        var elevators = new List<ElevatorModel>()
+        {
+            new ElevatorModel(_mapper),
+            new ElevatorModel(_mapper),
+            new ElevatorModel(_mapper)
+        };
+
+        elevatorsField?.SetValue(_mockElevatorControllerService.Object, elevators);
+
+        var methodInfo = GetNonPublicInstanceMethod<TerminalUiService>("AddElevatorRows");
+        Assert.That(methodInfo, Is.Not.Null);
+
+        _mockTerminalUiService.CallBaseElevatorRows = true;
+        methodInfo.Invoke(_mockTerminalUiService, null);
+
+        var tableRowCount = GetElevatorsTableViewRowCount(elevatorsTableView);
+        var dataRowsCount = _mockElevatorControllerService.Object.ElevatorDataRows.Count;
+
+        Assert.That(tableRowCount, Is.EqualTo(dataRowsCount));
+
+        return elevatorsTableView;
+    }
+
+    private int GetElevatorsTableViewRowCount(PropertyInfo? elevatorsTableView)
+        => (elevatorsTableView?.GetValue(_mockTerminalUiService) as TableView)?.Table?.Rows?.Count ?? 0;
 }
