@@ -1,33 +1,42 @@
 ﻿using NStack;
 using Otis.Sim.Utilities.Extensions;
 
-namespace Otis.Sim.Interface.Validators.Helpers
+namespace Otis.Sim.Interface.Validators.Helpers;
+
+/// <summary>
+/// UStringHelper class
+/// </summary>
+public static class UStringHelper
 {
-    public static class UStringHelper
+    /// <summary>
+    /// ToInteger
+    /// </summary>
+    /// <param name="stringValue"></param>
+    /// <returns></returns>
+    public static int? ToInteger(ustring? stringValue)
     {
-        public static int? ToInteger(ustring? stringValue)
-        {
-            if (stringValue == null)
-            {
-                return null;
-            }
-
-            if (int.TryParse(stringValue.ToString(), out int numericValue))
-            {
-                return numericValue;
-            }
+        if (stringValue == null)
             return null;
-        }
 
-        public static bool IsInRange(ustring? stringValue, int minValue, int maxValue)
-        {
-            var numberValue = ToInteger(stringValue);
-            if (!numberValue.HasValue)
-            {
-                return false;
-            }
+        if (int.TryParse(stringValue.ToString(), out int numericValue))
+            return numericValue;
 
-            return numberValue.Value.IsInRange(minValue, maxValue);
-        }
+        return null;
+    }
+
+    /// <summary>
+    /// IsInRange
+    /// </summary>
+    /// <param name="stringValue"></param>
+    /// <param name="minValue"></param>
+    /// <param name="maxValue"></param>
+    /// <returns></returns>
+    public static bool IsInRange(ustring? stringValue, int minValue, int maxValue)
+    {
+        var numberValue = ToInteger(stringValue);
+        if (!numberValue.HasValue)
+            return false;
+
+        return numberValue.Value.IsInRange(minValue, maxValue);
     }
 }
