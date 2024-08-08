@@ -54,4 +54,7 @@ public abstract class TestConstants
     /// The HasAnEmptyValue constant.
     /// </summary>
     public const string HasAnEmptyValue = "has an empty value";
+
+    public static string NewLineMessageLengthError(int expectedLength, int actualLength)
+        => $"Expected {expectedLength} new line messages, received {actualLength}";
 }

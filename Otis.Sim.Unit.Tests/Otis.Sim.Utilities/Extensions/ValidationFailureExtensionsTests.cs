@@ -1,4 +1,5 @@
 ﻿using FluentValidation.Results;
+using Otis.Sim.Unit.Tests.Constants;
 using Otis.Sim.Utilities.Constants;
 using Otis.Sim.Utilities.Extensions;
 
@@ -24,9 +25,7 @@ public class ValidationFailureExtensionsTests : ExtensionsTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        _failures = new List<ValidationFailure>();
-        for (var i = 0; i < _failuresCount; i++)
-            _failures.Add(new ValidationFailure($"property{i}", $"message{i}"));
+        _failures = GetMockValidationFailures(_failuresCount);
     }
 
     /// <summary>
@@ -56,9 +55,10 @@ public class ValidationFailureExtensionsTests : ExtensionsTests
     [Test]
     public void ToNewLineString_MultipleMessages()
     {
-        var result = _failures.Take(_failuresCount).ToList().ToNewLineString();
-        var messageParts = result.Split(new string[] { UtilityConstants.NewLineCharacter }, StringSplitOptions.None);
-        if (messageParts.Length != _failuresCount)
-            Assert.Fail($"Expected {_failuresCount} new line messages, received {messageParts.Length}");
+        var result         = _failures.Take(_failuresCount).ToList().ToNewLineString();
+        var numberOfErrors = SplitByNewLineCharacterLength(result);
+
+        if (numberOfErrors != _failuresCount)
+            Assert.Fail(TestConstants.NewLineMessageLengthError(_failuresCount, numberOfErrors));
     }
 }

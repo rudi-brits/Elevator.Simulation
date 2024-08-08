@@ -1,9 +1,20 @@
-﻿namespace Otis.Sim.Elevator.Models
+﻿namespace Otis.Sim.Elevator.Models;
+
+/// <summary>
+/// ElevatorRequestValidationValues class
+/// </summary>
+public class ElevatorRequestValidationValues
 {
-    public class ElevatorRequestValidationValues
-    {
-        public int LowestFloor { get; set; }
-        public int HighestFloor { get; set; }
-        public int MaximumLoad { get; set; }
-    }
+    /// <summary>
+    /// LowestFloor
+    /// </summary>
+    public int LowestFloor { get; set; }
+    /// <summary>
+    /// HighestFloor
+    /// </summary>
+    public int HighestFloor { get; set; }
+    /// <summary>
+    /// MaximumLoad
+    /// </summary>
+    public int MaximumLoad { get; set; }
 }

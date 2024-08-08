@@ -5,7 +5,7 @@ using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Elevator.Models;
 
 /// <summary>
-/// Class ElevatorEnum extends the <see cref="ElevatorTests" /> class.
+/// Class ElevatorAcceptedRequestTests extends the <see cref="ElevatorTests" /> class.
 /// </summary>
 public class ElevatorAcceptedRequestTests : ElevatorTests
 {

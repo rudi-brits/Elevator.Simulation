@@ -4,23 +4,33 @@ using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 
 namespace Otis.Sim.Elevator.Models;
 
+/// <summary>
+/// Class ElevatorRequest extends the <see cref="ElevatorRequestBase" /> class.
+/// </summary>
 public class ElevatorRequest : ElevatorRequestBase
 {
+    /// <summary>
+    /// ElevatorId
+    /// </summary>
     public int? ElevatorId { get; set; }
+    /// <summary>
+    /// RequestStatus
+    /// </summary>
     public RequestStatus RequestStatus
     {
         get
         {
             if (ElevatorId == null)
-            {
                 return RequestStatus.Pending;
-            }
 
             return ElevatorId > 0
                 ? RequestStatus.Assigned
                 : RequestStatus.Complete;
         }
     }
+    /// <summary>
+    /// Direction
+    /// </summary>
     public ElevatorDirection Direction
     {
         get
@@ -31,6 +41,10 @@ public class ElevatorRequest : ElevatorRequestBase
         }
     }
 
+    /// <summary>
+    /// ElevatorRequest constructor
+    /// </summary>
+    /// <param name="userInputRequest"></param>
     public ElevatorRequest(UserInputRequest userInputRequest)
     {
         Id               = Guid.NewGuid();
@@ -39,6 +53,9 @@ public class ElevatorRequest : ElevatorRequestBase
         NumberOfPeople   = (int)UStringHelper.ToInteger(userInputRequest.CapacityInput)!;
     }
 
+    /// <summary>
+    /// ToDuplicateRequestString function
+    /// </summary>
     public string ToDuplicateRequestString()
     {
         return
@@ -47,6 +64,9 @@ public class ElevatorRequest : ElevatorRequestBase
             $"{nameof(Direction)}: {Direction}";
     }
 
+    /// <summary>
+    /// ToQueuedRequestString function
+    /// </summary>
     public string ToQueuedRequestString()
     {
         return

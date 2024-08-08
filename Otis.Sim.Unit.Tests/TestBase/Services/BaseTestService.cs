@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FluentValidation.Results;
 using Otis.Sim.MappingProfiles;
+using Otis.Sim.Utilities.Constants;
 using System.Reflection;
 
 namespace Otis.Sim.Unit.Tests.TestBase.Services;
@@ -9,6 +11,10 @@ namespace Otis.Sim.Unit.Tests.TestBase.Services;
 /// </summary>
 public abstract class BaseTestService
 {
+    /// <summary>
+    /// SetupIMapper function
+    /// </summary>
+    /// <returns></returns>
     protected IMapper SetupIMapper()
     {
         var configuration = new MapperConfiguration(config =>
@@ -20,6 +26,32 @@ public abstract class BaseTestService
 
         return mapper;
     }
+
+    /// <summary>
+    /// GetMockValidationFailures creates mock <see cref="List" /> of <see cref="ValidationFailure" /> 
+    /// </summary>
+    /// <param name="numberOfFailures"></param>
+    /// <returns></returns>
+    protected List<ValidationFailure> GetMockValidationFailures(int numberOfFailures)
+    {
+        var failures = new List<ValidationFailure>();
+        for (var i = 0; i < numberOfFailures; i++)
+            failures.Add(new ValidationFailure($"property{i}", $"message{i}"));
+
+        return failures;
+    }
+
+    /// <summary>
+    /// GetNumberOfErrorsInValidationFailuresString returns the number of newline character elements in the string.
+    /// </summary>
+    /// <param name="errorMessage"></param>
+    /// <returns></returns>
+    protected int SplitByNewLineCharacterLength(string errorMessage)
+    {
+        var errors = errorMessage.Split(new string[] { UtilityConstants.NewLineCharacter }, 
+            StringSplitOptions.None);
+        return errors.Length;
+    }    
 
     /// <summary>
     /// Gets a PropertyInfo[] of public instance properties.

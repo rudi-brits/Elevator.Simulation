@@ -9,14 +9,23 @@ namespace Otis.Sim.Unit.Tests.Configuration.Models;
 public class BuildingConfigurationTests : ConfigurationTests
 {
     /// <summary>
-    /// A test instance of the <see cref="BuildingConfiguration" /> class.
+    /// _buildingConfiguration
     /// </summary>
-    private BuildingConfiguration _buildingConfiguration = new BuildingConfiguration()
+    private BuildingConfiguration _buildingConfiguration;
+
+    /// <summary>
+    /// OneTimeSetUp of mocks and services.
+    /// </summary>
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        LowestFloor         = 10,
-        HighestFloor        = 20,
-        MaximumElevatorLoad = 30
-    };
+        _buildingConfiguration = new BuildingConfiguration()
+        {
+            LowestFloor         = 10,
+            HighestFloor        = 20,
+            MaximumElevatorLoad = 30
+        };
+    }
 
     /// <summary>
     /// Ensure properties can be initialised as zero.
