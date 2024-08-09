@@ -63,6 +63,16 @@ public abstract class BaseTestService
             .GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
     /// <summary>
+    /// Gets PropertyInfo? of a public instance property.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="propertyName"></param>
+    /// <returns>An array of <see cref="PropertyInfo"/></returns>
+    protected PropertyInfo? GetPublicInstanceProperty<T>(string propertyName)
+        => typeof(T)
+            .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+
+    /// <summary>
     /// Gets PropertyInfo? of a nonpublic instance property.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -98,6 +108,15 @@ public abstract class BaseTestService
     protected FieldInfo[] GetNonPublicInstanceFields<T>()
         => typeof(T)
             .GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+    // <summary>
+    /// Gets PropertyInfo of a public instance field.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns>An array of <see cref="FieldInfo"/></returns>
+    protected FieldInfo? GetPublicInstanceField<T>(string fieldName)
+        => typeof(T)
+            .GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
 
     // <summary>
     /// Gets PropertyInfo of a non public instance field.
@@ -141,4 +160,154 @@ public abstract class BaseTestService
     protected MethodInfo? GetNonPublicInstanceMethod<T>(string methodName)
         => typeof(T)
             .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+
+    /// <summary>
+    /// Gets a nested type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="typeName"></param>
+    /// <returns></returns>
+    protected Type? GetNestedType<T>(string typeName)
+        => typeof(T)
+            .GetNestedType(typeName, BindingFlags.Public | BindingFlags.NonPublic);
+
+    /// <summary>
+    /// Gets a non public instance field an asserts that it is not null
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
+    protected FieldInfo GetPublicInstanceFieldNotNull<T>(string propertyName)
+    {
+        var field = GetPublicInstanceField<T>(propertyName);
+        Assert.That(field, Is.Not.Null);
+
+        return field;
+    }
+
+    /// <summary>
+    /// Gets a non public instance field an asserts that it is not null
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
+    protected FieldInfo GetNonPublicInstanceFieldNotNull<T>(string propertyName)
+    {
+        var field = GetNonPublicInstanceField<T>(propertyName);
+        Assert.That(field, Is.Not.Null);
+
+        return field;
+    }
+
+    /// <summary>
+    /// Gets a public instance field an asserts that it is not null
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
+    protected PropertyInfo GetPublicInstancePropertyNotNull<T>(string propertyName)
+    {
+        var property = GetPublicInstanceProperty<T>(propertyName);
+        Assert.That(property, Is.Not.Null);
+
+        return property;
+    }
+
+    /// <summary>
+    /// Gets a non public instance field an asserts that it is not null
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
+    protected PropertyInfo GetNonPublicInstancePropertyNotNull<T>(string propertyName)
+    {
+        var property = GetNonPublicInstanceProperty<T>(propertyName);
+        Assert.That(property, Is.Not.Null);
+
+        return property;
+    }
+
+    /// <summary>
+    /// Validates that a field value is not null and returns it
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="fieldInfo"></param>
+    /// <param name="elevatorModel"></param>
+    /// <param name="isNotNull"></param>
+    /// <returns></returns>
+    protected object? ValidateFieldValue<T>(FieldInfo fieldInfo, T elevatorModel, bool isNotNull = true)
+    {
+        var value = fieldInfo.GetValue(elevatorModel);
+        AssertObjectNullNotNull(value, isNotNull);
+
+        return value;
+    }
+
+    /// <summary>
+    /// Validates that a property value is not null and returns it
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="fieldInfo"></param>
+    /// <param name="elevatorModel"></param>
+    /// <param name="isNotNull"></param>
+    /// <returns></returns>
+    protected object? ValidatePropertyValue<T>(PropertyInfo propertyInfo, T elevatorModel, bool isNotNull = true)
+    {
+        var value = propertyInfo.GetValue(elevatorModel);
+        AssertObjectNullNotNull(value, isNotNull);
+
+        return value;
+    }
+
+    /// <summary>
+    /// Assert nullability of an object
+    /// </summary>
+    /// <param name="testObject"></param>
+    /// <param name="isNotNull"></param>
+    protected void AssertObjectNullNotNull(object? testObject, bool isNotNull)
+    {
+        if (isNotNull)
+            Assert.That(testObject, Is.Not.Null);
+        else
+            Assert.That(testObject, Is.Null);
+    }
+
+    /// <summary>
+    /// Assert nullability of a type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="typeName"></param>
+    protected void GetNestedTypeNotNull<T>(string typeName)
+    {
+        var type = GetNestedType<T>(typeName);
+        Assert.That(type, Is.Not.Null);
+    }
+
+    /// <summary>
+    /// Gets a public instance method and tests nullability
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="methodName"></param>
+    /// <returns></returns>
+    protected MethodInfo GetPublicInstanceMethodNotNull<T>(string methodName)
+    {
+        var method = GetPublicInstanceMethod<T>(methodName);
+        Assert.That(method, Is.Not.Null);
+
+        return method;
+    }
+
+    /// <summary>
+    /// Gets a nonpublic instance method and tests nullability
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="methodName"></param>
+    /// <returns></returns>
+    protected MethodInfo GetNonPublicInstanceMethodNotNull<T>(string methodName)
+    {
+        var method = GetNonPublicInstanceMethod<T>(methodName);
+        Assert.That(method, Is.Not.Null);
+
+        return method;
+    }
 }

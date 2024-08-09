@@ -6,12 +6,30 @@ using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 
 namespace Otis.Sim.Elevator.Models;
 
+/// <summary>
+/// Class ElevatorModel extends the <see cref="ElevatorConfigurationBase" /> class.
+/// </summary>
 public class ElevatorModel : ElevatorConfigurationBase
 {
+    /// <summary>
+    /// Id
+    /// </summary>
     public int Id { get; set; }
-    public new int LowestFloor { get; set; }
-    public new int HighestFloor { get; set; }
-    public int CurrentFloor { get; set; } = 0;
+    /// <summary>
+    /// LowestFloor
+    /// </summary>
+    public int LowestFloor { get; set; }
+    /// <summary>
+    /// HighestFloor
+    /// </summary>
+    public int HighestFloor { get; set; }
+    /// <summary>
+    /// CurrentFloor
+    /// </summary>
+    public int CurrentFloor { get; set; }
+    /// <summary>
+    /// NextFloor
+    /// </summary>
     public int? NextFloor
     {
         get
@@ -27,6 +45,9 @@ public class ElevatorModel : ElevatorConfigurationBase
             return null;
         }
     }
+    /// <summary>
+    /// LastFloor
+    /// </summary>
     public int? LastFloor
     {
         get
@@ -37,12 +58,74 @@ public class ElevatorModel : ElevatorConfigurationBase
                 : _currentDirectionQueue.OrderByDescending(x => x).LastOrDefault();
         }
     }
-    public int CurrentLoad { get; set; } = 0;
-    public int MaximumLoad { get; set; }
-    public int Capacity => MaximumLoad - CurrentLoad;
 
-    private ElevatorDirection? _elevatorDirection;
-    private ElevatorDirection? _currentDirection
+    /// <summary>
+    /// CurrentLoad
+    /// </summary>
+    public int CurrentLoad { get; set; }
+    /// <summary>
+    /// MaximumLoad
+    /// </summary>
+    public int MaximumLoad { get; set; }
+    /// <summary>
+    /// Capacity
+    /// </summary>
+    public int Capacity => MaximumLoad - CurrentLoad;
+    /// <summary>
+    /// FloorMoveTime
+    /// </summary>
+    public int FloorMoveTime { get; set; } = 4500;
+    /// <summary>
+    /// DoorsOpenTime
+    /// </summary>
+    public int DoorsOpenTime { get; set; } = 2500;
+    /// <summary>
+    /// CompleteRequestDelegate definition
+    /// </summary>
+    /// <param name="requestId"></param>
+    public delegate void CompleteRequestDelegate(Guid requestId);
+    /// <summary>
+    /// CompleteRequest
+    /// </summary>
+    public CompleteRequestDelegate? CompleteRequest;
+    /// <summary>
+    /// RequeueRequestDelegate definition
+    /// </summary>
+    /// <param name="requestId"></param>
+    public delegate void RequeueRequestDelegate(Guid requestId);
+    /// <summary>
+    /// RequeueRequest
+    /// </summary>
+    public RequeueRequestDelegate? RequeueRequest;
+    /// <summary>
+    /// PrintRequestStatusDelegate definition
+    /// </summary>
+    /// <param name="message"></param>
+    public delegate void PrintRequestStatusDelegate(string message);
+    /// <summary>
+    /// PrintRequestStatus
+    /// </summary>
+    public PrintRequestStatusDelegate? PrintRequestStatus;
+    /// <summary>
+    /// _isMoving
+    /// </summary>
+    protected bool _isMoving = false;
+    /// <summary>
+    /// _currentStatus
+    /// </summary>
+    protected ElevatorStatus _currentStatus { get; set; } = ElevatorStatus.Idle;
+    /// <summary>
+    /// CurrentStatus
+    /// </summary>
+    public ElevatorStatus CurrentStatus => _currentStatus;
+    /// <summary>
+    /// _elevatorDirection
+    /// </summary>
+    protected ElevatorDirection? _elevatorDirection;
+    /// <summary>
+    /// _currentDirection
+    /// </summary>
+    protected ElevatorDirection? _currentDirection
     {
         get
         {
@@ -57,37 +140,44 @@ public class ElevatorModel : ElevatorConfigurationBase
             return _elevatorDirection;
         }
     }
-
-    private ElevatorStatus _currentStatus { get; set; } = ElevatorStatus.Idle;
-    public ElevatorStatus CurrentStatus => _currentStatus;
-
-    private bool _isMoving = false;
-
-    private bool _isPrimaryDirection { get; set; } = true;
-    private SortedSet<int> _primaryDirectionQueue = new SortedSet<int>();
-    private SortedSet<int> _secondaryDirectionQueue = new SortedSet<int>();
-    private SortedSet<int> _currentDirectionQueue
+    /// <summary>
+    /// _isPrimaryDirection
+    /// </summary>
+    protected bool _isPrimaryDirection { get; set; } = true;
+    /// <summary>
+    /// _primaryDirectionQueue
+    /// </summary>
+    protected SortedSet<int> _primaryDirectionQueue = new SortedSet<int>();
+    /// <summary>
+    /// _secondaryDirectionQueue
+    /// </summary>
+    protected SortedSet<int> _secondaryDirectionQueue = new SortedSet<int>();
+    /// <summary>
+    /// _currentDirectionQueue
+    /// </summary>
+    protected SortedSet<int> _currentDirectionQueue
         => _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
+    /// <summary>
+    /// _acceptedRequests
+    /// </summary>
+    protected List<ElevatorAcceptedRequest> _acceptedRequests = new List<ElevatorAcceptedRequest>();
+    /// <summary>
+    /// _mapper
+    /// </summary>
+    protected readonly IMapper _mapper;
+    /// <summary>
+    /// _floorMoveTimer
+    /// </summary>
+    protected readonly Timer _floorMoveTimer;
+    /// <summary>
+    /// _doorsOpenTimer
+    /// </summary>
+    protected readonly Timer _doorsOpenTimer;
 
-    private List<ElevatorAcceptedRequest> _acceptedRequests = new List<ElevatorAcceptedRequest>();
-
-    public int FloorMoveTime { get; set; } = 4500;
-    public int DoorsOpenTime { get; set; } = 2500;
-
-    private Timer _floorMoveTimer;
-    private Timer _doorsOpenTimer;
-
-    public delegate void CompleteRequestDelegate(Guid requestId);
-    public CompleteRequestDelegate CompleteRequest;
-
-    public delegate void RequeueRequestDelegate(Guid requestId);
-    public RequeueRequestDelegate RequeueRequest;
-
-    public delegate void PrintRequestStatusDelegate(string message);
-    public PrintRequestStatusDelegate PrintRequestStatus;
-
-    private readonly IMapper _mapper;
-
+    /// <summary>
+    /// ElevatorModel constructor
+    /// </summary>
+    /// <param name="mapper"></param>
     public ElevatorModel(IMapper mapper)
     {
         _mapper = mapper;
@@ -96,6 +186,25 @@ public class ElevatorModel : ElevatorConfigurationBase
         _doorsOpenTimer = new Timer(CloseDoors, null, Timeout.Infinite, Timeout.Infinite);
     }
 
+    /// <summary>
+    /// ElevatorModel constructor
+    /// </summary>
+    /// <param name="mapper"></param>
+    /// <param name="floorMoveTimer"></param>
+    /// <param name="doorsOpenTimer"></param>
+    public ElevatorModel(IMapper mapper, Timer floorMoveTimer, Timer doorsOpenTimer)
+    {
+        _mapper = mapper;
+
+        _floorMoveTimer = floorMoveTimer;
+        _doorsOpenTimer = doorsOpenTimer;
+    }
+
+    /// <summary>
+    /// CanAcceptRequest
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public bool CanAcceptRequest(ElevatorRequest request)
     {
         return
@@ -104,10 +213,21 @@ public class ElevatorModel : ElevatorConfigurationBase
             IsFloorAndDirectionValid(request.OriginFloor, request.Direction);
     }
 
-    private bool IsFloorInRange(int floor) =>
+    /// <summary>
+    /// IsFloorInRange function
+    /// </summary>
+    /// <param name="floor"></param>
+    /// <returns></returns>
+    protected virtual bool IsFloorInRange(int floor) =>
         floor.IsInRange(LowestFloor, HighestFloor);
 
-    private bool IsSameDirectionOnRoute(int requestOriginFloor, ElevatorDirection requestDirection)
+    /// <summary>
+    /// IsSameDirectionOnRoute function
+    /// </summary>
+    /// <param name="requestOriginFloor"></param>
+    /// <param name="requestDirection"></param>
+    /// <returns></returns>
+    protected virtual bool IsSameDirectionOnRoute(int requestOriginFloor, ElevatorDirection requestDirection)
     {
         if (requestDirection == ElevatorDirection.Up)
             return requestOriginFloor > CurrentFloor;
@@ -118,7 +238,13 @@ public class ElevatorModel : ElevatorConfigurationBase
         return false;
     }
 
-    private bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
+    /// <summary>
+    /// IsFloorAndDirectionValid function
+    /// </summary>
+    /// <param name="originFloor"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    protected virtual bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
     {
         Debug.WriteLine($"currentFloor: {CurrentFloor}, originFloor: {originFloor}, direction: {direction}, " +
             "lastFloor: {LastFloor}");
@@ -160,7 +286,7 @@ public class ElevatorModel : ElevatorConfigurationBase
 
             _acceptedRequests.Add(acceptedRequest);
 
-            PrintRequestStatus(acceptedRequest.ToAcceptedRequestString());
+            PrintRequestStatus!(acceptedRequest.ToAcceptedRequestString());
 
             if (!_isMoving)
                 MoveElevator();
@@ -171,7 +297,7 @@ public class ElevatorModel : ElevatorConfigurationBase
         return false;
     }
 
-    private void InitiateElevatorMove(object? state)
+    protected virtual void InitiateElevatorMove(object? state)
     {
         var nextFloor = NextFloor;
         if (nextFloor == null)
@@ -199,7 +325,7 @@ public class ElevatorModel : ElevatorConfigurationBase
         }
     }
 
-    private void OpenDoors()
+    protected virtual void OpenDoors()
     {
         _currentStatus = ElevatorStatus.DoorsOpen;
         _doorsOpenTimer.Change(DoorsOpenTime, Timeout.Infinite);
@@ -216,7 +342,7 @@ public class ElevatorModel : ElevatorConfigurationBase
             var statusMessage = destinationRequest.ToDroppedOffRequestString(
                 destinationRequest.NumberOfPeople, Capacity);
 
-            PrintRequestStatus(statusMessage);
+            PrintRequestStatus!(statusMessage);
             HandleCompletedRequest(destinationRequest);
         }
 
@@ -242,18 +368,18 @@ public class ElevatorModel : ElevatorConfigurationBase
             var statusMessage = originRequest.ToPickedUpRequestString(
                originRequest.NumberOfPeople, Capacity);
 
-            PrintRequestStatus(statusMessage);
+            PrintRequestStatus!(statusMessage);
             HandleCompletedRequest(originRequest);
         }
     }
 
-    private void CloseDoors(object? state)
+    protected virtual void CloseDoors(object? state)
     {
         _doorsOpenTimer.Change(Timeout.Infinite, Timeout.Infinite);
         MoveToNextFloor();
     }
 
-    private void MoveToNextFloor()
+    protected virtual void MoveToNextFloor()
     {
         if (NextFloor == null)
         {
@@ -264,38 +390,38 @@ public class ElevatorModel : ElevatorConfigurationBase
             MoveElevator();
     }
 
-    private void MoveElevator()
+    protected virtual void MoveElevator()
     {
         _floorMoveTimer.Change(0, FloorMoveTime);
         _isMoving = true;
     }
 
-    private void StopElevator()
+    protected virtual void StopElevator()
     {
         _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
         _isMoving = false;
     }
 
-    private void HandleCompletedRequest(ElevatorAcceptedRequest request)
+    protected virtual void HandleCompletedRequest(ElevatorAcceptedRequest request)
     {
         if (request.Completed)
         {
             RemoveAcceptedRequest(request.Id);
 
-            CompleteRequest.Invoke(request.Id);
-            PrintRequestStatus(request.ToCompletedRequestString());
+            CompleteRequest!.Invoke(request.Id);
+            PrintRequestStatus!(request.ToCompletedRequestString());
         }
     }
 
-    private void HandleRequeueRequest(ElevatorAcceptedRequest request)
+    protected virtual void HandleRequeueRequest(ElevatorAcceptedRequest request)
     {
         RemoveAcceptedRequest(request.Id);
 
-        RequeueRequest.Invoke(request.Id);
-        PrintRequestStatus(request.ToRequeuedRequestString());
+        RequeueRequest!.Invoke(request.Id);
+        PrintRequestStatus!(request.ToRequeuedRequestString());
     }
 
-    private void RemoveAcceptedRequest(Guid id)
+    protected virtual void RemoveAcceptedRequest(Guid id)
     {
         _acceptedRequests = _acceptedRequests
            .Where(request => request.Id != id)

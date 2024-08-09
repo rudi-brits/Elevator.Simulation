@@ -23,8 +23,6 @@ public class ElevatorConfigurationBaseTests : ConfigurationTests
         var result = new SampleClass();
 
         Assert.That(result.Description, Is.EqualTo(string.Empty));
-        Assert.That(result.LowestFloor, Is.Null);
-        Assert.That(result.HighestFloor, Is.Null);
     }
 
     /// <summary>
@@ -35,13 +33,9 @@ public class ElevatorConfigurationBaseTests : ConfigurationTests
     {
         var sampleInstance = new SampleClass
         {
-            Description  = "Sample test",
-            LowestFloor  = 10,
-            HighestFloor = 201
+            Description  = "Sample test"
         };
 
         Assert.That(sampleInstance.Description, Is.EqualTo("Sample test"));
-        Assert.That(sampleInstance.LowestFloor, Is.EqualTo(10));
-        Assert.That(sampleInstance.HighestFloor, Is.EqualTo(201));
     }
 }
