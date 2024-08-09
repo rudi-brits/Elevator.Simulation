@@ -276,9 +276,8 @@ public class ElevatorModel : ElevatorConfigurationBase
             }
             else
             {
-                var targetQueue = _isPrimaryDirection ? _primaryDirectionQueue : _secondaryDirectionQueue;
-                targetQueue.Add(request.OriginFloor);
-                targetQueue.Add(request.DestinationFloor);
+                _currentDirectionQueue.Add(request.OriginFloor);
+                _currentDirectionQueue.Add(request.DestinationFloor);
             }
 
             var acceptedRequest = _mapper.Map<ElevatorAcceptedRequest>(request);

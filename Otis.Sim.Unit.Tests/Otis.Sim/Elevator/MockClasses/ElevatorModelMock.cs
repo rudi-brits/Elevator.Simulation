@@ -22,6 +22,14 @@ public class ElevatorModelMock : ElevatorModel
     /// CalledIsFloorAndDirectionValid field.
     /// </summary>
     public bool CalledIsFloorAndDirectionValid = false;
+    /// <summary>
+    /// CalledPrintRequestStatus
+    /// </summary>
+    public bool CalledPrintRequestStatus = false;
+    /// <summary>
+    /// CalledMoveElevator
+    /// </summary>
+    public bool CalledMoveElevator = false;
 
     /// <summary>
     /// CallBaseIsFloorInRange field.
@@ -66,6 +74,7 @@ public class ElevatorModelMock : ElevatorModel
     public ElevatorModelMock(IMapper mapper, Timer floorMoveTimer, Timer doorsOpenTimer) 
         : base(mapper, floorMoveTimer, doorsOpenTimer)
     {
+        PrintRequestStatus = (string message) => { CalledPrintRequestStatus = true; };
     }
 
     protected override bool IsFloorInRange(int floor)
@@ -99,5 +108,10 @@ public class ElevatorModelMock : ElevatorModel
             return base.IsFloorAndDirectionValid(originFloor, direction);
 
         return IsFloorAndDirectionValidMockReturnValue;
+    }
+
+    protected override void MoveElevator()
+    {
+        CalledMoveElevator = true;
     }
 }
