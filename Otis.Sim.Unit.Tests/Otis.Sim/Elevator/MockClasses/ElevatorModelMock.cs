@@ -30,6 +30,22 @@ public class ElevatorModelMock : ElevatorModel
     /// CalledMoveElevator
     /// </summary>
     public bool CalledMoveElevator = false;
+    /// <summary>
+    /// CalledStopElevator
+    /// </summary>
+    public bool CalledStopElevator = false;
+    /// <summary>
+    /// CalledOpenDoors
+    /// </summary>
+    public bool CalledOpenDoors = false;
+    /// <summary>
+    /// CalledHandleCompletedRequest
+    /// </summary>
+    public bool CalledHandleCompletedRequest = false;
+    /// <summary>
+    /// CalledHandleRequeueRequest
+    /// </summary>
+    public bool CalledHandleRequeueRequest = false;
 
     /// <summary>
     /// CallBaseIsFloorInRange field.
@@ -43,6 +59,10 @@ public class ElevatorModelMock : ElevatorModel
     /// CallBaseIsFloorAndDirectionValid
     /// </summary>
     public bool CallBaseIsFloorAndDirectionValid = false;
+    /// <summary>
+    /// CallBaseOpenDoors
+    /// </summary>
+    public bool CallBaseOpenDoors = false;
 
     /// <summary>
     /// IsFirstFloorInRangeMockReturnValue
@@ -62,25 +82,33 @@ public class ElevatorModelMock : ElevatorModel
     public bool IsFloorAndDirectionValidMockReturnValue = true;
 
     /// <summary>
-    /// 
+    /// secondFloorInRangeFloor
     /// </summary>
     public int secondFloorInRangeFloor = int.MinValue + 1;
+    /// <summary>
+    /// PrintRequestStatusMessage
+    /// </summary>
+    public string? PrintRequestStatusMessage;
 
-    public ElevatorModelMock(IMapper mapper) 
+    public ElevatorModelMock(IMapper mapper)
         : base(mapper)
     {
     }
 
-    public ElevatorModelMock(IMapper mapper, Timer floorMoveTimer, Timer doorsOpenTimer) 
+    public ElevatorModelMock(IMapper mapper, Timer floorMoveTimer, Timer doorsOpenTimer)
         : base(mapper, floorMoveTimer, doorsOpenTimer)
     {
-        PrintRequestStatus = (string message) => { CalledPrintRequestStatus = true; };
+        PrintRequestStatus = (string message) =>
+        {
+            CalledPrintRequestStatus = true;
+            PrintRequestStatusMessage = message;
+        };
     }
 
     protected override bool IsFloorInRange(int floor)
     {
         CalledIsFloorInRange = true;
-        if (CallBaseIsFloorInRange) 
+        if (CallBaseIsFloorInRange)
             return base.IsFloorInRange(floor);
 
         if (floor == secondFloorInRangeFloor)
@@ -88,7 +116,7 @@ public class ElevatorModelMock : ElevatorModel
             CalledIsSecondFloorInRange = true;
             return IsSecondFloorInRangeMockReturnValue;
         }
-        
+
         return IsFirstFloorInRangeMockReturnValue;
     }
 
@@ -110,8 +138,32 @@ public class ElevatorModelMock : ElevatorModel
         return IsFloorAndDirectionValidMockReturnValue;
     }
 
+    protected override void OpenDoors()
+    {
+        CalledOpenDoors = true;
+        if (CallBaseOpenDoors)
+            base.OpenDoors();
+    }
+
     protected override void MoveElevator()
     {
         CalledMoveElevator = true;
+        _isMoving = true;
+    }
+
+    protected override void StopElevator()
+    {
+        CalledStopElevator = true;
+        _isMoving = false;
+    }
+
+    protected override void HandleCompletedRequest(ElevatorAcceptedRequest request)
+    {
+        CalledHandleCompletedRequest = true;
+    }
+
+    protected override void HandleRequeueRequest(ElevatorAcceptedRequest request)
+    {
+        CalledHandleRequeueRequest = true;
     }
 }

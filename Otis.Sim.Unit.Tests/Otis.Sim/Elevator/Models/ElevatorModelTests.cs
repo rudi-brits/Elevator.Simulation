@@ -154,7 +154,7 @@ public class ElevatorModelMockTests : ElevatorTests
         _elevatorModelMock.CallBaseIsSameDirectionOnRoute   = false;
 
         var currentStatusProperty = GetCurrentStatusProperty();
-        SetCurrentStatusProperty(currentStatusProperty, currentStatus);
+        SetCurrentStatusValue(currentStatusProperty, currentStatus);
 
         var methodInfo = GetNonPublicInstanceMethodNotNull<ElevatorModelMock>("IsFloorAndDirectionValid");
         var result     = methodInfo.Invoke(_elevatorModelMock, new object[] { 1, direction });
@@ -237,7 +237,7 @@ public class ElevatorModelMockTests : ElevatorTests
         var request = new ElevatorRequest(userInputRequest);
 
         var currentStatusProperty = GetCurrentStatusProperty();
-        SetCurrentStatusProperty(currentStatusProperty, currentStatus);
+        SetCurrentStatusValue(currentStatusProperty, currentStatus);
 
         _elevatorModelMock.IsSameDirectionOnRouteMockReturnValue = isSameDirectionOnRoute;
 
@@ -279,12 +279,221 @@ public class ElevatorModelMockTests : ElevatorTests
     }
 
     /// <summary>
-    /// GetIsMovingField
+    /// InitiateElevatorMove with expected result
+    /// </summary>
+    /// <param name="currentFloor"></param>
+    /// <param name="nextFloor"></param>
+    /// <param name="isPrimaryDirection"></param>
+    /// <param name="expectedStatus"></param>
+    [Test]
+    [TestCase(1, null, true)]
+    [TestCase(1, null, false)]
+    [TestCase(1, 2, true, ElevatorStatus.MovingUp)]
+    [TestCase(-1, 14, false, ElevatorStatus.MovingUp)]
+    [TestCase(2, 1, true, ElevatorStatus.MovingDown)]
+    [TestCase(14, -1, false, ElevatorStatus.MovingDown)]
+    [TestCase(-2, -2, false)]
+    [TestCase(1, 1, false)]
+    public void InitiateElevatorMove_ExpectedResult(int currentFloor, int? nextFloor, bool isPrimaryDirection,
+        ElevatorStatus expectedStatus = ElevatorStatus.Idle)
+    {
+        var currentFloorProperty         = GetCurrentFloorProperty();
+        var primaryDirectionQueueField   = GetPrimaryDirectionQueueField();
+        var secondaryDirectionQueueField = GetSecondaryDirectionQueueField();
+
+        var queueField = isPrimaryDirection
+            ? primaryDirectionQueueField
+            : secondaryDirectionQueueField;
+
+        var queue = new SortedSet<int>();
+        if (nextFloor != null)
+            queue.Add((int)nextFloor);
+
+        queueField.SetValue(_elevatorModelMock, queue);
+
+        currentFloorProperty.SetValue(_elevatorModelMock, currentFloor);
+
+        var methodInfo = GetNonPublicInstanceMethodNotNull<ElevatorModelMock>("InitiateElevatorMove");
+        methodInfo.Invoke(_elevatorModelMock, new object[] { null! });
+
+        var currentFloorValue            = GetCurrentFloorValue(_elevatorModelMock);
+        var primaryDirectionQueueValue   = GetPrimaryDirectionQueueValue(_elevatorModelMock) as SortedSet<int>;
+        var secondaryDirectionQueueValue = GetSecondaryDirectionQueueValue(_elevatorModelMock) as SortedSet<int>;
+        var currentStatusValue           = GetCurrentStatusValue(_elevatorModelMock);
+
+        var areCurrentAndNextFloorEqual = nextFloor == currentFloor;
+
+        if (nextFloor == null || areCurrentAndNextFloorEqual)
+        {
+            Assert.That(currentFloorValue, Is.EqualTo(currentFloor));
+            Assert.That(primaryDirectionQueueValue!.Any(), Is.False);
+            Assert.That(secondaryDirectionQueueValue!.Any(), Is.False);
+            Assert.That(_elevatorModelMock.CalledStopElevator, Is.EqualTo(areCurrentAndNextFloorEqual));
+            Assert.That(_elevatorModelMock.CalledOpenDoors, Is.EqualTo(areCurrentAndNextFloorEqual));
+        }
+        else
+        {
+            var newCurrentFloor = nextFloor > currentFloor
+                ? ++currentFloor
+                : --currentFloor;
+
+            Assert.That(currentFloorValue, Is.EqualTo(newCurrentFloor));
+            Assert.That(primaryDirectionQueueValue!.Any(), Is.EqualTo(isPrimaryDirection));
+            Assert.That(secondaryDirectionQueueValue!.Any(), Is.EqualTo(!isPrimaryDirection));
+            Assert.That(_elevatorModelMock.CalledStopElevator, Is.False);
+            Assert.That(_elevatorModelMock.CalledOpenDoors, Is.False);
+        }
+
+        Assert.That(currentStatusValue, Is.EqualTo(expectedStatus));
+    }
+
+    [Test]
+    [TestCase(1, 4, 1)]
+    [TestCase(1, 1, 4, true)]
+    [TestCase(1, 1, 4, false, 10)]
+    [TestCase(1, 1, 4, false)]
+    public void OpenDoors_ExpectedResult(int currentFloor, int originFloor, int destinationFloor,
+        bool setCapacityToZero = false, int numberOfPeople = 2)
+    {
+        var initialCurrentLoadValue = setCapacityToZero
+            ? 10
+            : 6;
+        var maximumLoadValue = 10;
+
+        var currentFloorProperty = GetCurrentFloorProperty();
+        currentFloorProperty.SetValue(_elevatorModelMock, currentFloor);
+
+        var currentLoadProperty = GetCurrentLoadProperty();
+        currentLoadProperty.SetValue(_elevatorModelMock, initialCurrentLoadValue);
+
+        var maximumLoadProperty = GetMaximumLoadProperty();
+        maximumLoadProperty.SetValue(_elevatorModelMock, maximumLoadValue);
+
+        var initialCapacityValue = (int)GetCapacityValue(_elevatorModelMock)!;
+
+        var acceptedRequestsField = GetAcceptedRequestsField();
+        var acceptedRequest = new ElevatorAcceptedRequest()
+        {
+            OriginFloor      = originFloor,
+            DestinationFloor = destinationFloor,
+            NumberOfPeople   = numberOfPeople
+        };
+        var acceptedRequestsList = new List<ElevatorAcceptedRequest>()
+        {
+            acceptedRequest
+        };
+        acceptedRequestsField.SetValue(_elevatorModelMock, acceptedRequestsList);
+
+        _elevatorModelMock.CallBaseOpenDoors = true;
+
+        var methodInfo = GetNonPublicInstanceMethodNotNull<ElevatorModelMock>("OpenDoors");
+        methodInfo.Invoke(_elevatorModelMock, null);
+
+        var currentLoadValue = (int)GetCurrentLoadValue(_elevatorModelMock)!;
+        var capacityValue = (int)GetCapacityValue(_elevatorModelMock)!;
+
+        if (currentFloor == destinationFloor)
+        {
+            var droppedOffMessage = acceptedRequest.ToDroppedOffRequestString(acceptedRequest.NumberOfPeople, capacityValue);
+
+            Assert.That(acceptedRequest.DestinationFloorServiced, Is.True);
+            Assert.That(currentLoadValue, Is.EqualTo(initialCurrentLoadValue - acceptedRequest.NumberOfPeople));
+            Assert.That(_elevatorModelMock.CalledPrintRequestStatus, Is.True);
+            Assert.That(_elevatorModelMock.PrintRequestStatusMessage, Is.EqualTo(droppedOffMessage));
+            Assert.That(_elevatorModelMock.CalledHandleCompletedRequest, Is.True);
+        }
+        else if(currentFloor == originFloor)
+        {
+            var pickedUpMessage = acceptedRequest.ToPickedUpRequestString(acceptedRequest.NumberOfPeople, capacityValue);
+
+            Assert.That(acceptedRequest.OriginFloorServiced, Is.True);
+
+            if (setCapacityToZero)
+            {
+                Assert.That(_elevatorModelMock.CalledHandleRequeueRequest, Is.True);
+                return;
+            }
+                
+            if (initialCapacityValue < numberOfPeople)
+                Assert.That(acceptedRequest.NumberOfPeople, Is.EqualTo(initialCapacityValue));
+
+            Assert.That(currentLoadValue, Is.EqualTo(initialCurrentLoadValue + acceptedRequest.NumberOfPeople));
+            Assert.That(_elevatorModelMock.PrintRequestStatusMessage, Is.EqualTo(pickedUpMessage));
+            Assert.That(_elevatorModelMock.CalledHandleCompletedRequest, Is.True);
+        }
+    }
+
+    /// <summary>
+    /// GetCurrentFloorValue
+    /// </summary>
+    /// <returns></returns>
+    private PropertyInfo GetCurrentFloorProperty()
+        => GetPublicInstancePropertyNotNull<ElevatorModelMock>("CurrentFloor");
+
+    /// <summary>
+    /// GetCurrentFloorValue
     /// </summary>
     /// <param name="elevatorModelMock"></param>
     /// <returns></returns>
+    private object? GetCurrentFloorValue(ElevatorModelMock elevatorModelMock)
+    {
+        var currentFloorProperty = GetCurrentFloorProperty();
+        return ValidatePropertyValue(currentFloorProperty, elevatorModelMock);
+    }
+
+    /// <summary>
+    /// GetIsMovingField
+    /// </summary>
+    /// <returns></returns>
     private FieldInfo GetIsMovingField()
         => GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_isMoving");
+
+    /// <summary>
+    /// GetCurrentLoadProperty
+    /// </summary>
+    /// <returns></returns>
+    private PropertyInfo GetCurrentLoadProperty()
+        => GetPublicInstancePropertyNotNull<ElevatorModelMock>("CurrentLoad");
+
+    /// <summary>
+    /// GetCurrentLoadValue
+    /// </summary>
+    /// <param name="elevatorModelMock"></param>
+    /// <returns></returns>
+    private object? GetCurrentLoadValue(ElevatorModelMock elevatorModelMock)
+    {
+        var currentLoadProperty = GetCurrentLoadProperty();
+        return ValidatePropertyValue(currentLoadProperty, elevatorModelMock);
+    }
+
+    /// <summary>
+    /// GetMaximumLoadProperty
+    /// </summary>
+    /// <returns></returns>
+    private PropertyInfo GetMaximumLoadProperty()
+        => GetPublicInstancePropertyNotNull<ElevatorModelMock>("MaximumLoad");
+
+    /// <summary>
+    /// GetMaximumLoadValue
+    /// </summary>
+    /// <param name="elevatorModelMock"></param>
+    /// <returns></returns>
+    private object? GetMaximumLoadValue(ElevatorModelMock elevatorModelMock)
+    {
+        var currentLoadProperty = GetMaximumLoadProperty();
+        return ValidatePropertyValue(currentLoadProperty, elevatorModelMock);
+    }
+
+    /// <summary>
+    /// GetCapacityValue
+    /// </summary>
+    /// <param name="elevatorModelMock"></param>
+    /// <returns></returns>
+    private object? GetCapacityValue(ElevatorModelMock elevatorModelMock)
+    {
+        var capacityProperty = GetPublicInstancePropertyNotNull<ElevatorModelMock>("Capacity");
+        return ValidatePropertyValue(capacityProperty, elevatorModelMock);
+    }
 
     /// <summary>
     /// GetIsMovingValue
@@ -305,12 +514,28 @@ public class ElevatorModelMockTests : ElevatorTests
         => GetNonPublicInstancePropertyNotNull<ElevatorModelMock>("_currentStatus");
 
     /// <summary>
+    /// GetCurrentStatusValue
+    /// </summary>
+    private object? GetCurrentStatusValue(ElevatorModelMock elevatorModelMock)
+    {
+        var currentStatusProperty = GetCurrentStatusProperty();
+        return ValidatePropertyValue(currentStatusProperty, elevatorModelMock);
+    }
+
+    /// <summary>
     /// SetCurrentStatusProperty
     /// </summary>
     /// <param name="currentStatusProperty"></param>
     /// <param name="elevatorStatus"></param>
-    private void SetCurrentStatusProperty(PropertyInfo currentStatusProperty, ElevatorStatus elevatorStatus)
+    private void SetCurrentStatusValue(PropertyInfo currentStatusProperty, ElevatorStatus elevatorStatus)
         => currentStatusProperty.SetValue(_elevatorModelMock, elevatorStatus);
+
+    /// <summary>
+    /// GetPrimaryDirectionQueueField
+    /// </summary>
+    /// <returns></returns>
+    private FieldInfo GetPrimaryDirectionQueueField()
+        => GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_primaryDirectionQueue");
 
     /// <summary>
     /// GetPrimaryDirectionQueueValue
@@ -319,9 +544,16 @@ public class ElevatorModelMockTests : ElevatorTests
     /// <returns></returns>
     private object? GetPrimaryDirectionQueueValue(ElevatorModelMock elevatorModelMock)
     {
-        var primaryDirectionQueueField = GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_primaryDirectionQueue");
+        var primaryDirectionQueueField = GetPrimaryDirectionQueueField();
         return ValidateFieldValue(primaryDirectionQueueField, elevatorModelMock);
     }
+
+    /// <summary>
+    /// GetSecondaryDirectionQueueField
+    /// </summary>
+    /// <returns></returns>
+    private FieldInfo GetSecondaryDirectionQueueField()
+        => GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_secondaryDirectionQueue");
 
     /// <summary>
     /// GetSecondaryDirectionQueueValue
@@ -330,7 +562,7 @@ public class ElevatorModelMockTests : ElevatorTests
     /// <returns></returns>
     private object? GetSecondaryDirectionQueueValue(ElevatorModelMock elevatorModelMock)
     {
-        var secondaryDirectionQueueField = GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_secondaryDirectionQueue");
+        var secondaryDirectionQueueField = GetSecondaryDirectionQueueField();
         return ValidateFieldValue(secondaryDirectionQueueField, elevatorModelMock);
     }
 
@@ -344,6 +576,24 @@ public class ElevatorModelMockTests : ElevatorTests
         var currentDirectionProperty = GetNonPublicInstancePropertyNotNull<ElevatorModelMock>("_currentDirectionQueue");
         return ValidatePropertyValue(currentDirectionProperty, elevatorModelMock);
     }
+
+    /// <summary>
+    /// GetAcceptedRequestsField
+    /// </summary>
+    /// <returns></returns>
+    private FieldInfo GetAcceptedRequestsField()
+        => GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_acceptedRequests");
+
+    /// <summary>
+    /// GetAcceptedRequestsValue
+    /// </summary>
+    /// <param name="elevatorModelMock"></param>
+    /// <returns></returns>
+    private object? GetAcceptedRequestsValue(ElevatorModelMock elevatorModelMock)
+    {
+        var acceptedRequestsField = GetAcceptedRequestsField();
+        return ValidateFieldValue(acceptedRequestsField, elevatorModelMock);
+    }    
 
     /// <summary>
     /// ValidateConstructorInitialisationsAndDefaults
@@ -365,8 +615,7 @@ public class ElevatorModelMockTests : ElevatorTests
         var highestFloorValue = ValidatePropertyValue(highestFloorProperty, elevatorModelMock);
         Assert.That(highestFloorValue, Is.EqualTo(0));
 
-        var currentFloorProperty = GetPublicInstancePropertyNotNull<ElevatorModelMock>("CurrentFloor");
-        var currentFloorValue = ValidatePropertyValue(currentFloorProperty, elevatorModelMock);
+        var currentFloorValue = GetCurrentFloorValue(elevatorModelMock);
         Assert.That(currentFloorValue, Is.EqualTo(0));
 
         var nextFloorProperty = GetPublicInstancePropertyNotNull<ElevatorModelMock>("NextFloor");
@@ -376,16 +625,13 @@ public class ElevatorModelMockTests : ElevatorTests
         var lastFloorValue = ValidatePropertyValue(lastFloorProperty, elevatorModelMock);
         Assert.That(lastFloorValue, Is.EqualTo(0));
 
-        var currentLoadProperty = GetPublicInstancePropertyNotNull<ElevatorModelMock>("CurrentLoad");
-        var currentLoadValue = ValidatePropertyValue(currentLoadProperty, elevatorModelMock);
+        var currentLoadValue = GetCurrentLoadValue(elevatorModelMock);
         Assert.That(currentLoadValue, Is.EqualTo(0));
 
-        var maximumLoadProperty = GetPublicInstancePropertyNotNull<ElevatorModelMock>("MaximumLoad");
-        var maximumLoadValue = ValidatePropertyValue(maximumLoadProperty, elevatorModelMock);
+        var maximumLoadValue = GetMaximumLoadValue(elevatorModelMock);
         Assert.That(maximumLoadValue, Is.EqualTo(0));
 
-        var capacityProperty = GetPublicInstancePropertyNotNull<ElevatorModelMock>("Capacity");
-        var capacityValue = ValidatePropertyValue(capacityProperty, elevatorModelMock);
+        var capacityValue = GetCapacityValue(elevatorModelMock);
         Assert.That(capacityValue, Is.EqualTo(0));
 
         var floorMoveTimeProperty = GetPublicInstancePropertyNotNull<ElevatorModelMock>("FloorMoveTime");
@@ -442,10 +688,8 @@ public class ElevatorModelMockTests : ElevatorTests
         var currentDirectionQueueValue = GetCurrentDirectionQueueValue(elevatorModelMock);
         Assert.That(currentDirectionQueueValue, Is.EqualTo(secondaryDirectionQueueValue));
 
-        var acceptedRequestsField = GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_acceptedRequests");
-        var acceptedRequestsValue = ValidateFieldValue(acceptedRequestsField, elevatorModelMock);
+        var acceptedRequestsValue = GetAcceptedRequestsValue(elevatorModelMock);
         Assert.That(acceptedRequestsValue, Is.EqualTo(new List<ElevatorAcceptedRequest>()));
-
 
         var mapperField = GetNonPublicInstanceFieldNotNull<ElevatorModelMock>("_mapper");
         ValidateFieldValue(mapperField, elevatorModelMock);

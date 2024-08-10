@@ -261,6 +261,11 @@ public class ElevatorModel : ElevatorConfigurationBase
         return IsSameDirectionOnRoute(originFloor, direction);
     }
 
+    /// <summary>
+    /// AcceptRequest
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public bool AcceptRequest(ElevatorRequest request)
     {
         if (IsFloorAndDirectionValid(request.OriginFloor, request.Direction))
@@ -296,6 +301,10 @@ public class ElevatorModel : ElevatorConfigurationBase
         return false;
     }
 
+    /// <summary>
+    /// InitiateElevatorMove
+    /// </summary>
+    /// <param name="state"></param>
     protected virtual void InitiateElevatorMove(object? state)
     {
         var nextFloor = NextFloor;
