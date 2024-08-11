@@ -12,7 +12,7 @@ public static class UStringHelper
     /// ToInteger
     /// </summary>
     /// <param name="stringValue"></param>
-    /// <returns></returns>
+    /// <returns>The int? result</returns>
     public static int? ToInteger(ustring? stringValue)
     {
         if (stringValue == null)
@@ -30,7 +30,7 @@ public static class UStringHelper
     /// <param name="stringValue"></param>
     /// <param name="minValue"></param>
     /// <param name="maxValue"></param>
-    /// <returns></returns>
+    /// <returns>The int? result</returns>
     public static bool IsInRange(ustring? stringValue, int minValue, int maxValue)
     {
         var numberValue = ToInteger(stringValue);

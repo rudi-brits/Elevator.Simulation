@@ -6,8 +6,14 @@ using MessageService = Otis.Sim.Messages.Services.ValidationMessageService;
 
 namespace Otis.Sim.Configuration.Validators;
 
+/// <summary>
+/// BuildingConfigurationValidator extends the <see cref="AbstractValidator" /> class.
+/// </summary>
 public class BuildingConfigurationValidator : AbstractValidator<BuildingConfiguration>
 {
+    /// <summary>
+    /// BuildingConfigurationValidator constructor
+    /// </summary>
     public BuildingConfigurationValidator()
     {
         const string modelPrefix = $"{nameof(BuildingConfiguration)} - ";

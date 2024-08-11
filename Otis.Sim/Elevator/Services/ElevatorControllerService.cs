@@ -77,7 +77,7 @@ public class ElevatorControllerService : ElevatorConfigurationService
     /// <summary>
     /// RunRequestQueueConsumer
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The Task result</returns>
     protected virtual Task RunRequestQueueConsumer()
         => Task.Run(() => RequestQueueConsumer());
 
@@ -94,7 +94,7 @@ public class ElevatorControllerService : ElevatorConfigurationService
     /// RequestElevator
     /// </summary>
     /// <param name="userInputRequest"></param>
-    /// <returns></returns>
+    /// <returns>The ElevatorRequestResult result</returns>
     public virtual ElevatorRequestResult RequestElevator(UserInputRequest userInputRequest)
     {
         var userInputValidationResult = ValidateUserInputRequest(userInputRequest);
@@ -112,7 +112,7 @@ public class ElevatorControllerService : ElevatorConfigurationService
     /// ValidateUserInputRequest
     /// </summary>
     /// <param name="request"></param>
-    /// <returns></returns>
+    /// <returns>The ElevatorRequestResult? result</returns>
     protected virtual ElevatorRequestResult? ValidateUserInputRequest(UserInputRequest request)
     {
         var validationResult = new UserInputRequestValidator()
@@ -128,7 +128,7 @@ public class ElevatorControllerService : ElevatorConfigurationService
     /// ValidateElevatorRequest
     /// </summary>
     /// <param name="request"></param>
-    /// <returns></returns>
+    /// <returns>The ElevatorRequestResult? result</returns>
     protected virtual ElevatorRequestResult? ValidateElevatorRequest(ElevatorRequest request)
     {
         var validationResult = new ElevatorRequestValidator(_elevatorRequestValidationValues!)
@@ -144,7 +144,7 @@ public class ElevatorControllerService : ElevatorConfigurationService
     /// ValidateDuplicateElevatorRequest
     /// </summary>
     /// <param name="request"></param>
-    /// <returns></returns>
+    /// <returns>The ElevatorRequestResult? result</returns>
     protected virtual ElevatorRequestResult? ValidateDuplicateElevatorRequest(ElevatorRequest request)
     {
         var isAlreadyQueued = _requestQueue.Any(queueRequest =>
@@ -235,7 +235,7 @@ public class ElevatorControllerService : ElevatorConfigurationService
     /// RequestElevator
     /// </summary>
     /// <param name="request"></param>
-    /// <returns></returns>
+    /// <returns>The int/ result</returns>
     protected virtual int? RequestElevator(ElevatorRequest request)
     {
         var elevator = _elevators

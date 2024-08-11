@@ -1,14 +1,18 @@
 ﻿using Otis.Sim.Services;
 
-namespace Elevator.Simulation
-{
-    internal class Program
-    {
-        private static OtisSimulationService _otisSimulationService;
+namespace Elevator.Simulation;
 
-        static void Main(string[] args)
-        { 
-            _otisSimulationService = new OtisSimulationService();
-        }
+/// <summary>
+/// Program
+/// </summary>
+internal class Program
+{
+    /// <summary>
+    /// Main
+    /// </summary>
+    /// <param name="args"></param>
+    static void Main(string[] args)
+    { 
+        new OtisSimulationService();
     }
 }

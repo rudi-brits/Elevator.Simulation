@@ -38,9 +38,17 @@ public abstract class TestConstants
     /// </summary>
     public const string Interface = "Interface";
     /// <summary>
+    /// The MappingProfilesCategory constant
+    /// </summary>
+    public const string MappingProfilesCategory = "Mapping Profiles";
+    /// <summary>
     /// The MessagesCategory constant.
     /// </summary>
     public const string MessagesCategory = "Messages";
+    /// <summary>
+    /// The MappingProfilesCategory constant
+    /// </summary>
+    public const string SimulationServiceCategory = "Simulation Service";
 
     /// <summary>
     /// The EmptyPropertiesMessage constant.

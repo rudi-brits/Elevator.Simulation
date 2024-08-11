@@ -32,48 +32,59 @@ public class ElevatorAcceptedRequest : ElevatorRequestBase
     /// <summary>
     /// ToAcceptedRequestString
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The string result</returns>
     public string ToAcceptedRequestString()
         => ToStatusString(OtisSimConstants.Accepted);
+
     /// <summary>
     /// ToPickedUpRequestString
     /// </summary>
     /// <param name="numberOfPeople"></param>
     /// <param name="capacity"></param>
-    /// <returns></returns>
+    /// <returns>The string result</returns>
     public string ToPickedUpRequestString(int numberOfPeople, int capacity)
         => ToEmbarkDisembarkString(OtisSimConstants.PickUp, numberOfPeople, capacity);
 
+    /// <summary>
+    /// ToDroppedOffRequestString
+    /// </summary>
+    /// <param name="numberOfPeople"></param>
+    /// <param name="capacity"></param>
+    /// <returns>The string result</returns>
     public string ToDroppedOffRequestString(int numberOfPeople, int capacity)
         => ToEmbarkDisembarkString(OtisSimConstants.DropOff, numberOfPeople, capacity);
+
     /// <summary>
     /// ToEmbarkDisembarkString
     /// </summary>
     /// <param name="description"></param>
     /// <param name="numberOfPeople"></param>
     /// <param name="capacity"></param>
-    /// <returns></returns>
+    /// <returns>The string result</returns>
     private string ToEmbarkDisembarkString(string description, int numberOfPeople, int capacity)
         => $"{ToStatusString($"{ElevatorStatus.DoorsOpen} ({description})")}, " +
            $"{OtisSimConstants.PeopleName}: {numberOfPeople}, " +
            $"{OtisSimConstants.Capacity}: {capacity}, ";
+
     /// <summary>
     /// ToCompletedRequestString
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The string result</returns>
     public string ToCompletedRequestString()
         => ToStatusString(OtisSimConstants.Completed);
+
     /// <summary>
     /// ToRequeuedRequestString
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The string result</returns>
     public string ToRequeuedRequestString()
         => ToStatusString(OtisSimConstants.Requeued);
+
     /// <summary>
     /// ToStatusString
     /// </summary>
     /// <param name="status"></param>
-    /// <returns></returns>
+    /// <returns>The string result</returns>
     private string ToStatusString(string status)
     {
         return

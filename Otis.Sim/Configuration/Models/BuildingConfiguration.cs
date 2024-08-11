@@ -1,14 +1,27 @@
-﻿namespace Otis.Sim.Configuration.Models
-{
-    public class BuildingConfiguration
-    {
-        public int LowestFloor { get; set; }
-        public int HighestFloor { get; set; }
-        public int MaximumElevatorLoad { get; set; }
+﻿namespace Otis.Sim.Configuration.Models;
 
-        public override string ToString()
-        {
-            return $"LowestFloor: {LowestFloor}, HighestFloor: {HighestFloor}, MaximumElevatorLoad: {MaximumElevatorLoad}";
-        }
-    }
+/// <summary>
+/// BuildingConfiguration
+/// </summary>
+public class BuildingConfiguration
+{
+    /// <summary>
+    /// LowestFloor
+    /// </summary>
+    public int LowestFloor { get; set; }
+    /// <summary>
+    /// HighestFloor
+    /// </summary>
+    public int HighestFloor { get; set; }
+    /// <summary>
+    /// MaximumElevatorLoad
+    /// </summary>
+    public int MaximumElevatorLoad { get; set; }
+
+    /// <summary>
+    /// ToString
+    /// </summary>
+    /// <returns>The string result</returns>
+    public override string ToString()
+        => $"LowestFloor: {LowestFloor}, HighestFloor: {HighestFloor}, MaximumElevatorLoad: {MaximumElevatorLoad}";
 }

@@ -3,33 +3,51 @@ using Otis.Sim.Configuration.Validators;
 using Otis.Sim.Utilities.Extensions;
 using System.Text.Json;
 
-namespace Otis.Sim.Configuration.Services
+namespace Otis.Sim.Configuration.Services;
+
+/// <summary>
+/// OtisConfigurationService
+/// </summary>
+public class OtisConfigurationService
 {
-    public class OtisConfigurationService
+    /// <summary>
+    /// _configuration
+    /// </summary>
+    private OtisConfiguration? _configuration { get; set; }
+    /// <summary>
+    /// BuildingConfiguration
+    /// </summary>
+    public BuildingConfiguration? BuildingConfiguration => _configuration?.BuildingConfiguration;
+    /// <summary>
+    /// ElevatorsConfiguration
+    /// </summary>
+    public List<ElevatorConfiguration>? ElevatorsConfiguration => _configuration?.ElevatorsConfiguration;
+
+    /// <summary>
+    /// LoadConfiguration
+    /// </summary>
+    /// <exception cref="ArgumentException"></exception>
+    public void LoadConfiguration()
     {
-        private OtisConfiguration? _configuration { get; set; }
+        string jsonConfiguration = ReadAppSettings();
+        var serializerOptions    = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var otisConfiguration    = JsonSerializer.Deserialize<OtisConfiguration>(jsonConfiguration, serializerOptions);
 
-        public BuildingConfiguration? BuildingConfiguration => _configuration?.BuildingConfiguration;
-        public List<ElevatorConfiguration>? ElevatorsConfiguration => _configuration?.ElevatorsConfiguration;
+        var validator        = new OtisConfigurationValidator();
+        var validationResult = validator.Validate(otisConfiguration!);
 
-        public void LoadConfiguration()
+        if (!validationResult.IsValid)
         {
-            string jsonConfiguration = ReadAppSettings();
-            var serializerOptions    = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var otisConfiguration    = JsonSerializer.Deserialize<OtisConfiguration>(jsonConfiguration, serializerOptions);
-
-            var validator        = new OtisConfigurationValidator();
-            var validationResult = validator.Validate(otisConfiguration!);
-
-            if (!validationResult.IsValid)
-            {
-                throw new ArgumentException(validationResult.Errors.ToNewLineString());
-            }
-
-            _configuration = otisConfiguration;
+            throw new ArgumentException(validationResult.Errors.ToNewLineString());
         }
 
-        protected virtual string ReadAppSettings()
-            => File.ReadAllText("appsettings.json");
+        _configuration = otisConfiguration;
     }
+
+    /// <summary>
+    /// ReadAppSettings
+    /// </summary>
+    /// <returns>The string result</returns>
+    protected virtual string ReadAppSettings()
+        => File.ReadAllText("appsettings.json");
 }

@@ -10,25 +10,25 @@ public class ConsoleFullScreenService
     /// <summary>
     /// GetConsoleWindow kernel32.dll function.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The IntPtr result</returns>
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern IntPtr GetConsoleWindow();
     /// <summary>
     /// GetWindowLong user32.dll function.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The int result</returns>
     [DllImport("user32.dll", SetLastError = true)]
     private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
     /// <summary>
     /// SetWindowLong user32.dll function.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The int result</returns>
     [DllImport("user32.dll", SetLastError = true)]
     private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
     /// <summary>
     /// ShowWindow user32.dll function.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The bool result</returns>
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     /// <summary>

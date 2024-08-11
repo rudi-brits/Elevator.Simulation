@@ -9,20 +9,35 @@ using Otis.Sim.MappingProfiles;
 
 namespace Otis.Sim.Services;
 
+/// <summary>
+/// OtisSimulationService class
+/// </summary>
 public class OtisSimulationService
 {
-    const string successPrefix = "Success - ";
+    /// <summary>
+    /// successPrefix
+    /// </summary>
+    protected string SuccessPrefix = "Success - ";
 
-    private ServiceProvider? _serviceProvider;
+    /// <summary>
+    /// _serviceProvider
+    /// </summary>
+    protected ServiceProvider? _serviceProvider;
 
+    /// <summary>
+    /// OtisSimulationService constructor
+    /// </summary>
     public OtisSimulationService()
     {
         RunSimulation();
     }
 
-    public void RunSimulation()
+    /// <summary>
+    /// RunSimulation
+    /// </summary>
+    public virtual void RunSimulation()
     {
-        var initilaisedSuccess = false;
+        var initialisedSuccess = false;
 
         try
         {
@@ -31,7 +46,7 @@ public class OtisSimulationService
             LoadAppConfiguration();
             LoadElevatorControllerConfiguration();
 
-            initilaisedSuccess = true;
+            initialisedSuccess = true;
         }
         catch (Exception exc)
         {
@@ -44,13 +59,17 @@ public class OtisSimulationService
             }
         }
 
-        DisplayUserInputMessage($"Press any key to {(initilaisedSuccess ? "continue" : "exit")}...");
+        DisplayUserInputMessage($"Press any key to {(initialisedSuccess ? "continue" : "exit")}...");
 
-        if (initilaisedSuccess)
+        if (initialisedSuccess)
             InitialiseTerminalUi();
     }
 
-    private void SetupServiceCollection()
+    /// <summary>
+    /// SetupServiceCollection
+    /// </summary>
+    /// <exception cref="Exception"></exception>
+    protected virtual void SetupServiceCollection()
     {
         try
         {
@@ -71,15 +90,15 @@ public class OtisSimulationService
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
 
-            Console.WriteLine(SetupServiceCollectionMessage());
+            WriteLineToConsole(SetupServiceCollectionMessage());
         }
         catch (Exception exc)
         {
             throw new Exception(SetupServiceCollectionMessage(false), exc);
         }
-    }
+    }    
 
-    private void LoadAppConfiguration()
+    protected virtual void LoadAppConfiguration()
     {
         try
         {
@@ -94,7 +113,7 @@ public class OtisSimulationService
         }
     }
 
-    private void LoadElevatorControllerConfiguration()
+    protected virtual void LoadElevatorControllerConfiguration()
     {
         try
         {
@@ -109,7 +128,7 @@ public class OtisSimulationService
         }
     }
 
-    private void InitialiseTerminalUi()
+    protected virtual void InitialiseTerminalUi()
     {
         try
         { 
@@ -122,19 +141,22 @@ public class OtisSimulationService
         }
     }
 
-    private string SetupServiceCollectionMessage(bool isSuccess = true)
-        => $"{GetPrefix(isSuccess)}setup services and service provider";
+    protected virtual string SetupServiceCollectionMessage(bool isSuccess = true)
+        => $"{GetPrefix(isSuccess)} setup services and service provider";
 
-    private string LoadAppConfigurationMessage(bool isSuccess = true)
+    protected virtual string LoadAppConfigurationMessage(bool isSuccess = true)
         => $"{GetPrefix(isSuccess)} load app configuration from appsettings";
 
-    private string LoadElevatorControllerConfigurationMessage(bool isSuccess = true)
+    protected virtual string LoadElevatorControllerConfigurationMessage(bool isSuccess = true)
         => $"{GetPrefix(isSuccess)} load elevator configuration";
 
-    private string GetPrefix(bool isSuccess = true)
-        => isSuccess ? successPrefix : "";
+    protected virtual string GetPrefix(bool isSuccess = true)
+        => isSuccess ? SuccessPrefix : "";
 
-    private void DisplayUserInputMessage(string message)
+    protected virtual void WriteLineToConsole(string message)
+        => Console.WriteLine(message);
+
+    protected virtual void DisplayUserInputMessage(string message)
     {
         Console.WriteLine(message);
         Console.ReadKey();

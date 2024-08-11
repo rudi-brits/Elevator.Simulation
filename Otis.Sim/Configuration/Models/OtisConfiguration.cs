@@ -1,8 +1,16 @@
-﻿namespace Otis.Sim.Configuration.Models
+﻿namespace Otis.Sim.Configuration.Models;
+
+/// <summary>
+/// OtisConfiguration
+/// </summary>
+public class OtisConfiguration
 {
-    public class OtisConfiguration
-    {
-        public BuildingConfiguration? BuildingConfiguration { get; set; }
-        public List<ElevatorConfiguration>? ElevatorsConfiguration { get; set; }
-    }
+    /// <summary>
+    /// BuildingConfiguration
+    /// </summary>
+    public BuildingConfiguration? BuildingConfiguration { get; set; }
+    /// <summary>
+    /// ElevatorsConfiguration
+    /// </summary>
+    public List<ElevatorConfiguration>? ElevatorsConfiguration { get; set; }
 }

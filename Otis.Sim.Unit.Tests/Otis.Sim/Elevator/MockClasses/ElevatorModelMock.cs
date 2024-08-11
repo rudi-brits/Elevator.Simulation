@@ -4,6 +4,9 @@ using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Elevator.MockClasses;
 
+/// <summary>
+/// ElevatorModelMock extends the <see cref="ElevatorModel" /> class.
+/// </summary>
 public class ElevatorModelMock : ElevatorModel
 {
     /// <summary>

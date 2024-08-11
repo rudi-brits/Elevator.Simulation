@@ -204,7 +204,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// CanAcceptRequest
     /// </summary>
     /// <param name="request"></param>
-    /// <returns></returns>
+    /// <returns>The bool result</returns>
     public virtual bool CanAcceptRequest(ElevatorRequest request)
     {
         return
@@ -217,7 +217,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// IsFloorInRange function
     /// </summary>
     /// <param name="floor"></param>
-    /// <returns></returns>
+    /// <returns>The bool result</returns>
     protected virtual bool IsFloorInRange(int floor) =>
         floor.IsInRange(LowestFloor, HighestFloor);
 
@@ -226,7 +226,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// </summary>
     /// <param name="requestOriginFloor"></param>
     /// <param name="requestDirection"></param>
-    /// <returns></returns>
+    /// <returns>The bool result</returns>
     protected virtual bool IsSameDirectionOnRoute(int requestOriginFloor, ElevatorDirection requestDirection)
     {
         if (requestDirection == ElevatorDirection.Up)
@@ -243,7 +243,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// </summary>
     /// <param name="originFloor"></param>
     /// <param name="direction"></param>
-    /// <returns></returns>
+    /// <returns>The bool result</returns>
     protected virtual bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
     {
         Debug.WriteLine($"currentFloor: {CurrentFloor}, originFloor: {originFloor}, direction: {direction}, " +
@@ -265,7 +265,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// AcceptRequest
     /// </summary>
     /// <param name="request"></param>
-    /// <returns></returns>
+    /// <returns>The bool result</returns>
     public virtual bool AcceptRequest(ElevatorRequest request)
     {
         if (IsFloorAndDirectionValid(request.OriginFloor, request.Direction))
@@ -467,7 +467,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// <summary>
     /// ToString
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The string result</returns>
     public override string ToString()
     {
         return $"{nameof(Description)}: {Description}, " +

@@ -12,17 +12,22 @@ namespace Otis.Sim.Unit.Tests.TestBase.Services;
 public abstract class BaseTestService
 {
     /// <summary>
+    /// _mapperConfiguration
+    /// </summary>
+    protected MapperConfiguration? OtisMapperConfiguration;
+
+    /// <summary>
     /// SetupIMapper function
     /// </summary>
     /// <returns></returns>
     protected IMapper SetupIMapper()
     {
-        var configuration = new MapperConfiguration(config =>
+        OtisMapperConfiguration = new MapperConfiguration(config =>
         {
             config.AddProfile<OtisMappingProfile>();
         });
 
-        var mapper = new Mapper(configuration);
+        var mapper = OtisMapperConfiguration.CreateMapper();
 
         return mapper;
     }
@@ -191,9 +196,9 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns></returns>
-    protected FieldInfo GetNonPublicInstanceFieldNotNull<T>(string propertyName)
+    protected FieldInfo GetNonPublicInstanceFieldNotNull<T>(string fieldName)
     {
-        var field = GetNonPublicInstanceField<T>(propertyName);
+        var field = GetNonPublicInstanceField<T>(fieldName);
         Assert.That(field, Is.Not.Null);
 
         return field;
