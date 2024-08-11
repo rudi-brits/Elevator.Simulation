@@ -196,6 +196,8 @@ public class ElevatorModelMockTests : ElevatorTests
 
         var request = new ElevatorRequest(userInputRequest);
 
+        _elevatorModelMock.CallBaseCanAcceptRequest = true;
+
         var methodInfo = GetPublicInstanceMethodNotNull<ElevatorModelMock>("CanAcceptRequest");
         var result = methodInfo.Invoke(_elevatorModelMock, new object[] { request });
 
@@ -245,6 +247,7 @@ public class ElevatorModelMockTests : ElevatorTests
         isMovingField.SetValue(_elevatorModelMock, isMoving);
 
         _elevatorModelMock.IsFloorAndDirectionValidMockReturnValue = isFloorAndDirectionValid;
+        _elevatorModelMock.CallBaseAcceptRequest = true;
 
         var methodInfo = GetPublicInstanceMethodNotNull<ElevatorModelMock>("AcceptRequest");
         var result = methodInfo.Invoke(_elevatorModelMock, new object[] { request });

@@ -205,7 +205,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public bool CanAcceptRequest(ElevatorRequest request)
+    public virtual bool CanAcceptRequest(ElevatorRequest request)
     {
         return
             IsFloorInRange(request.OriginFloor) &&
@@ -266,7 +266,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public bool AcceptRequest(ElevatorRequest request)
+    public virtual bool AcceptRequest(ElevatorRequest request)
     {
         if (IsFloorAndDirectionValid(request.OriginFloor, request.Direction))
         {

@@ -4,7 +4,6 @@ using Otis.Sim.Constants;
 using Otis.Sim.Elevator.Models;
 using Otis.Sim.Elevator.Validators;
 using Otis.Sim.Utilities.Helpers;
-using System.Diagnostics;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 using MessageService = Otis.Sim.Messages.Services.ValidationMessageService;
 
@@ -232,6 +231,11 @@ public class ElevatorControllerService : ElevatorConfigurationService
         }
     }
 
+    /// <summary>
+    /// RequestElevator
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     protected virtual int? RequestElevator(ElevatorRequest request)
     {
         var elevator = _elevators
@@ -248,6 +252,10 @@ public class ElevatorControllerService : ElevatorConfigurationService
         return null;
     }
 
+    /// <summary>
+    /// CompleteRequest
+    /// </summary>
+    /// <param name="requestId"></param>
     protected override void CompleteRequest(Guid requestId)
     {
         lock (_lockRequestQueue)
@@ -257,6 +265,10 @@ public class ElevatorControllerService : ElevatorConfigurationService
         }
     }
 
+    /// <summary>
+    /// RequeueRequest
+    /// </summary>
+    /// <param name="requestId"></param>
     protected override void RequeueRequest(Guid requestId)
     {
         lock (_lockRequestQueue)
@@ -269,6 +281,10 @@ public class ElevatorControllerService : ElevatorConfigurationService
         }
     }
 
+    /// <summary>
+    /// PrintRequestStatus
+    /// </summary>
+    /// <param name="message"></param>
     protected override void PrintRequestStatus(string message)
     {
         UpdateRequestStatus?.Invoke($"{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff")} - {message}");

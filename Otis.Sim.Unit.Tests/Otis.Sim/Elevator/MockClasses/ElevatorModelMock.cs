@@ -9,6 +9,14 @@ public class ElevatorModelMock : ElevatorModel
     /// <summary>
     /// CalledIsFloorInRange field.
     /// </summary>
+    public bool CalledCanAcceptRequest = false;
+    /// <summary>
+    /// CalledAcceptRequest field.
+    /// </summary>
+    public bool CalledAcceptRequest = false;
+    /// <summary>
+    /// CalledIsFloorInRange field.
+    /// </summary>
     public bool CalledIsFloorInRange = false;
     /// <summary>
     /// CalledIsSecondFloorInRange field.
@@ -68,6 +76,14 @@ public class ElevatorModelMock : ElevatorModel
     public bool CalledRequeueRequest = false;
 
     /// <summary>
+    /// CallBaseCanAcceptRequest field.
+    /// </summary>
+    public bool CallBaseCanAcceptRequest = false;
+    /// <summary>
+    /// CallBaseAcceptRequest field.
+    /// </summary>
+    public bool CallBaseAcceptRequest = false;
+    /// <summary>
     /// CallBaseIsFloorInRange field.
     /// </summary>
     public bool CallBaseIsFloorInRange = false;
@@ -104,6 +120,14 @@ public class ElevatorModelMock : ElevatorModel
     /// </summary>
     public bool CallBaseHandleRequeueRequest = false;
 
+    /// <summary>
+    /// CanAcceptRequestReturnValue
+    /// </summary>
+    public bool CanAcceptRequestReturnValue = false;
+    /// <summary>
+    /// AcceptRequestReturnValue
+    /// </summary>
+    public bool AcceptRequestReturnValue = false;
     /// <summary>
     /// IsFirstFloorInRangeMockReturnValue
     /// </summary>
@@ -159,6 +183,29 @@ public class ElevatorModelMock : ElevatorModel
         {
             CalledRequeueRequest = true;
         };
+    }
+
+    /// <summary>
+    /// CanAcceptRequest
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public override bool CanAcceptRequest(ElevatorRequest request)
+    {
+        CalledCanAcceptRequest = true;
+        if (CallBaseCanAcceptRequest)
+            return base.CanAcceptRequest(request);
+
+        return CanAcceptRequestReturnValue;
+    }
+
+    public override bool AcceptRequest(ElevatorRequest request)
+    {
+        CalledAcceptRequest = true;
+        if (CallBaseAcceptRequest)
+            return base.AcceptRequest(request);
+
+        return AcceptRequestReturnValue;
     }
 
     /// <summary>

@@ -51,23 +51,29 @@ public class ElevatorControllerServiceTests : ElevatorTests
     public void OneTimeSetUp()
     {
         _mapper = SetupIMapper();
-        _elevators = new List<ElevatorModel>()
-        {
-            new ElevatorModel(_mapper),
-            new ElevatorModel(_mapper),
-            new ElevatorModel(_mapper)
-        };
+        _elevators = new List<ElevatorModel>();
 
         _elevatorRequestValidationValues = new ElevatorRequestValidationValues()
         {
-            LowestFloor  = 0,
+            LowestFloor = 0,
             HighestFloor = 10,
-            MaximumLoad  = 10
+            MaximumLoad = 10
         };
+
+        for (var i = 0; i < 3; i++)
+        {
+            var elevatorModelMock = new ElevatorModelMock(_mapper);
+
+            elevatorModelMock.Id = i + 1;
+            elevatorModelMock.CurrentFloor = _elevatorRequestValidationValues.HighestFloor;
+            elevatorModelMock.CallBaseCanAcceptRequest = false;
+
+            _elevators.Add(elevatorModelMock);
+        }       
 
         _mockOtisConfigurationService = new Mock<OtisConfigurationService>();
         _mockElevatorControllerService = new Mock<ElevatorControllerService>(
-            _mockOtisConfigurationService.Object, _mapper);       
+            _mockOtisConfigurationService.Object, _mapper);
     }
 
     /// <summary>
@@ -506,11 +512,143 @@ public class ElevatorControllerServiceTests : ElevatorTests
             _elevatorControllerServiceMock.CalledUpdateRequestStatusMessage?.Contains(OtisSimConstants.ErrorProcessingRequest), Is.True);
     }
 
-
+    /// <summary>
+    /// RequestElevator with expected result 
+    /// </summary>
+    /// <param name="canAcceptCount"></param>
+    /// <param name="prioritisedElevatorId"></param>
     [Test]
-    public void RequestElevator_ExpectedResult()
+    [TestCase(0)]
+    [TestCase(1)]
+    [TestCase(3)]
+    [TestCase(3, 1)]
+    [TestCase(3, 2)]
+    [TestCase(3, 3)]
+    [TestCase(2, 1)]
+    [TestCase(2, 2)]
+    public void RequestElevator_ExpectedResult(int canAcceptCount, int? prioritisedElevatorId = null)
     {
+        var elevatorRequest = new ElevatorRequest(_userInputRequest);
+        var nearestFloorNumber = int.Parse(_userInputRequest.OriginFloorInput!.ToString()!) + 1;
 
+        for (var i = 0; i < canAcceptCount; i++)
+        {
+            var elevator = (_elevators[i] as ElevatorModelMock)!;
+
+            elevator!.CanAcceptRequestReturnValue = true;
+            elevator!.AcceptRequestReturnValue    = true;
+
+            if (prioritisedElevatorId == null)
+                elevator.CurrentFloor = nearestFloorNumber;
+            else
+            {
+                elevator.CurrentFloor = elevator.Id == prioritisedElevatorId
+                    ? nearestFloorNumber
+                    : nearestFloorNumber + 2;
+            }
+        }
+
+        var elevatorsField = GetElevatorsField();
+        elevatorsField.SetValue(_elevatorControllerServiceMock, _elevators);
+
+        _elevatorControllerServiceMock.CallBaseRequestElevator = true;
+
+        var methodInfo = GetNonPublicInstanceMethodNotNull<ElevatorControllerServiceMock>("RequestElevator");
+        var result = methodInfo.Invoke(_elevatorControllerServiceMock, new object[] { elevatorRequest });
+
+        var acceptedCount = 0;
+        for (var i = 0; i < _elevators.Count; i++)
+        {
+            var elevator = (_elevators[i] as ElevatorModelMock)!;
+            Assert.That(elevator!.CalledCanAcceptRequest, Is.True);
+
+            if (elevator.CanAcceptRequestReturnValue)
+                acceptedCount += 1;
+        }
+
+        Assert.That(acceptedCount, Is.AtLeast(canAcceptCount));
+
+        if (canAcceptCount == 0)
+            Assert.That(result, Is.Null);
+        else
+        {
+            Assert.That(result, Is.Not.Null.And.GreaterThan(0));
+
+            var assignedElevator = _elevators.FirstOrDefault(elevator =>
+            {
+                var mockElevator = (elevator as ElevatorModelMock)!;
+                return mockElevator.Id == (int)result &&
+                    mockElevator.CanAcceptRequestReturnValue == true &&
+                    mockElevator.AcceptRequestReturnValue == true;
+            });
+            
+            Assert.That(assignedElevator, Is.Not.Null);
+
+            if (prioritisedElevatorId != null)
+                Assert.That(assignedElevator!.Id, Is.EqualTo((int)prioritisedElevatorId));
+        }
+    }
+
+    /// <summary>
+    /// CompleteRequest with expected result 
+    /// </summary>
+    /// <param name="requestIdAlreadyAdded"></param>
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void CompleteRequest_ExpectedResult(bool requestIdAlreadyAdded)
+    {
+        var requestId = Guid.NewGuid();
+
+        var completedRequestIdsField = GetCompletedRequestIdsField();
+        var initialValue = requestIdAlreadyAdded
+            ? new HashSet<Guid> { requestId }
+            : new HashSet<Guid>();
+
+        completedRequestIdsField.SetValue(_elevatorControllerServiceMock, initialValue);
+
+        var methodInfo = GetNonPublicInstanceMethodNotNull<ElevatorControllerServiceMock>("CompleteRequest");
+        var result = methodInfo.Invoke(_elevatorControllerServiceMock, new object[] { requestId });
+
+        var completedRequestIdsValue = GetCompletedRequestIdsValue() as HashSet<Guid>;
+
+        Assert.That(completedRequestIdsValue!.Any(id => id == requestId), Is.True);
+    }
+
+    /// <summary>
+    /// RequeueRequest with expected result
+    /// </summary>
+    [Test]
+    public void RequeueRequest_ExpectedResult()
+    {
+        var elevatorRequest = new ElevatorRequest(_userInputRequest);
+        elevatorRequest.ElevatorId = 2;
+
+        var requestQueueField = GetRequestQueueField();
+        var requestQueue = new Queue<ElevatorRequest>();
+        requestQueue.Enqueue(elevatorRequest);
+
+        requestQueueField.SetValue(_elevatorControllerServiceMock, requestQueue);
+
+        var methodInfo = GetNonPublicInstanceMethodNotNull<ElevatorControllerServiceMock>("RequeueRequest");
+        methodInfo.Invoke(_elevatorControllerServiceMock, new object[] { elevatorRequest.Id });
+
+        Assert.That(elevatorRequest.ElevatorId, Is.Null);
+    }
+
+    /// <summary>
+    /// PrintRequestStatus with expected result
+    /// </summary>
+    [Test]
+    public void PrintRequestStatus_ExpectedResult()
+    {
+        var testMessage = nameof(PrintRequestStatus_ExpectedResult);
+
+        var methodInfo = GetNonPublicInstanceMethodNotNull<ElevatorControllerServiceMock>("PrintRequestStatus");
+        methodInfo.Invoke(_elevatorControllerServiceMock, new object[] { testMessage });
+
+        Assert.That(_elevatorControllerServiceMock.CalledUpdateRequestStatus, Is.True);
+        Assert.That(_elevatorControllerServiceMock.CalledUpdateRequestStatusMessage!.Contains(testMessage), Is.True);
     }
 
     /// <summary>
