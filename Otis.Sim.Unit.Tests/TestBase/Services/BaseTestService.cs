@@ -238,7 +238,7 @@ public abstract class BaseTestService
     protected object? ValidateFieldValue<T>(FieldInfo fieldInfo, T elevatorModel, bool isNotNull = true)
     {
         var value = fieldInfo.GetValue(elevatorModel);
-        AssertObjectNullNotNull(value, isNotNull);
+        AssertObjectNullability(value, isNotNull);
 
         return value;
     }
@@ -254,7 +254,7 @@ public abstract class BaseTestService
     protected object? ValidatePropertyValue<T>(PropertyInfo propertyInfo, T elevatorModel, bool isNotNull = true)
     {
         var value = propertyInfo.GetValue(elevatorModel);
-        AssertObjectNullNotNull(value, isNotNull);
+        AssertObjectNullability(value, isNotNull);
 
         return value;
     }
@@ -264,7 +264,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <param name="testObject"></param>
     /// <param name="isNotNull"></param>
-    protected void AssertObjectNullNotNull(object? testObject, bool isNotNull)
+    protected void AssertObjectNullability(object? testObject, bool isNotNull)
     {
         if (isNotNull)
             Assert.That(testObject, Is.Not.Null);

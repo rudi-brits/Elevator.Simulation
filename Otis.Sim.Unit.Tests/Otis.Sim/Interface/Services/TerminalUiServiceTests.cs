@@ -74,8 +74,8 @@ public class TerminalUiServiceTests : InterfaceTests
     public void Constructor_ObjectAssignments_Success()
     {
         // elevatorControllerService
-        var elevatorControllerServiceField = GetNonPublicInstanceField<TerminalUiService>("_elevatorControllerService");
-        Assert.That(elevatorControllerServiceField, Is.Not.Null);
+        var elevatorControllerServiceField = 
+            GetNonPublicInstanceFieldNotNull<TerminalUiService>("_elevatorControllerService");
 
         var elevatorControllerServiceValue = 
             elevatorControllerServiceField.GetValue(_mockTerminalUiService);
@@ -84,9 +84,8 @@ public class TerminalUiServiceTests : InterfaceTests
         Assert.That(elevatorControllerServiceValue, Is.EqualTo(_mockElevatorControllerService.Object));
 
         // _terminalGuiApplication
-        var terminalGuiApplicationField = GetNonPublicInstanceField<TerminalUiService>("_terminalGuiApplication");
-        Assert.That(terminalGuiApplicationField, Is.Not.Null);
-
+        var terminalGuiApplicationField 
+            = GetNonPublicInstanceFieldNotNull<TerminalUiService>("_terminalGuiApplication");
         var terminalGuiApplicationValue =
             terminalGuiApplicationField.GetValue(_mockTerminalUiService);
 
@@ -154,9 +153,9 @@ public class TerminalUiServiceTests : InterfaceTests
     public void ProcessRequest_ShowSuccessMessage(bool success)
     {
         var newTextField = new TextField("");
-        var originFloorInput      = GetNonPublicInstanceProperty<TerminalUiService>("_originFloorInput");
-        var destinationFloorInput = GetNonPublicInstanceProperty<TerminalUiService>("_destinationFloorInput");
-        var capacityInput         = GetNonPublicInstanceProperty<TerminalUiService>("_capacityInput");
+        var originFloorInput      = GetNonPublicInstancePropertyNotNull<TerminalUiService>("_originFloorInput");
+        var destinationFloorInput = GetNonPublicInstancePropertyNotNull<TerminalUiService>("_destinationFloorInput");
+        var capacityInput         = GetNonPublicInstancePropertyNotNull<TerminalUiService>("_capacityInput");
 
         originFloorInput?.SetValue(_mockTerminalUiService, newTextField);
         destinationFloorInput?.SetValue(_mockTerminalUiService, newTextField);
@@ -239,8 +238,7 @@ public class TerminalUiServiceTests : InterfaceTests
     [TestCase(15, false)]
     public void UpdateRequestStatus_Success(int numberOfMessages, bool statusViewIsNotNull)
     {
-        var requestStatusView = GetNonPublicInstanceProperty<TerminalUiService>("_requestStatusView");
-        Assert.That(requestStatusView, Is.Not.Null);
+        var requestStatusView = GetNonPublicInstancePropertyNotNull<TerminalUiService>("_requestStatusView");
 
         if (statusViewIsNotNull)
             requestStatusView!.SetValue(_mockTerminalUiService, new TextView());
@@ -299,9 +297,7 @@ public class TerminalUiServiceTests : InterfaceTests
     {
         SetupInitialiseTableDataRefresh();
 
-        var cancellationTokenSource = GetNonPublicInstanceField<TerminalUiService>("_cancellationTokenSource");
-        Assert.That(cancellationTokenSource, Is.Not.Null);
-
+        var cancellationTokenSource = GetNonPublicInstanceFieldNotNull<TerminalUiService>("_cancellationTokenSource");
         (cancellationTokenSource.GetValue(_mockTerminalUiService) as CancellationTokenSource)?.Cancel();
 
         var threadValue = GetRefreshDataThreadValue();
@@ -326,8 +322,7 @@ public class TerminalUiServiceTests : InterfaceTests
 
     private Thread GetRefreshDataThreadValue()
     {
-        var refreshDataThreadField = GetNonPublicInstanceField<TerminalUiService>("_refreshDataThread");
-        Assert.That(refreshDataThreadField, Is.Not.Null);
+        var refreshDataThreadField = GetNonPublicInstanceFieldNotNull<TerminalUiService>("_refreshDataThread");
 
         var threadValue = (refreshDataThreadField?.GetValue(_mockTerminalUiService)) as Thread;
         Assert.That(threadValue, Is.Not.Null);
@@ -341,8 +336,7 @@ public class TerminalUiServiceTests : InterfaceTests
     /// <param name="propertyName"></param>
     private void TestNonPublicPropertyValueNotNull(string propertyName)
     {
-        var property = GetNonPublicInstanceProperty<TerminalUiService>(propertyName);
-        Assert.That(property, Is.Not.Null);
+        var property = GetNonPublicInstancePropertyNotNull<TerminalUiService>(propertyName);
 
         var value = property.GetValue(_mockTerminalUiService);
         Assert.That(value, Is.Not.Null);
@@ -362,8 +356,8 @@ public class TerminalUiServiceTests : InterfaceTests
     /// <returns></returns>
     private PropertyInfo? SetupElevatorsTableView()
     {
-        var elevatorsTableView = GetNonPublicInstanceProperty<TerminalUiService>("_elevatorsTableView");
-        elevatorsTableView?.SetValue(_mockTerminalUiService, new TableView());
+        var elevatorsTableView = GetNonPublicInstancePropertyNotNull<TerminalUiService>("_elevatorsTableView");
+        elevatorsTableView.SetValue(_mockTerminalUiService, new TableView());
         return elevatorsTableView;
     }
 
@@ -395,9 +389,7 @@ public class TerminalUiServiceTests : InterfaceTests
     {
         var elevatorsTableView = SetupTableColumns();
 
-        var elevatorsField = GetNonPublicInstanceField<ElevatorControllerService>("_elevators");
-        Assert.That(elevatorsField, Is.Not.Null);
-
+        var elevatorsField = GetNonPublicInstanceFieldNotNull<ElevatorControllerService>("_elevators");
         var elevators = new List<ElevatorModel>()
         {
             new ElevatorModel(_mapper),

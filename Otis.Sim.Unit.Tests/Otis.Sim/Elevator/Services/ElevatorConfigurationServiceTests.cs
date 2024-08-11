@@ -64,18 +64,15 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
     [Test]
     public void Field_DefaultValues()
     {
-        var elevatorsField = GetNonPublicInstanceField<ConcreteElevatorConfigurationServiceMock>("_elevators");
-        Assert.That(elevatorsField, Is.Not.Null);
-
+        var elevatorsField = GetNonPublicInstanceFieldNotNull<ConcreteElevatorConfigurationServiceMock>("_elevators");
         var elevatorsValue =
             elevatorsField.GetValue(_elevatorConfigurationService);
 
         Assert.That(elevatorsValue, Is.Not.Null);
         Assert.That(elevatorsValue, Is.EqualTo(new List<ElevatorModel>()));
 
-        var elevatorRequestValidationValuesField = 
-            GetNonPublicInstanceField<ConcreteElevatorConfigurationServiceMock>("_elevatorRequestValidationValues");
-        Assert.That(elevatorRequestValidationValuesField, Is.Not.Null);
+        var elevatorRequestValidationValuesField =
+            GetNonPublicInstanceFieldNotNull<ConcreteElevatorConfigurationServiceMock>("_elevatorRequestValidationValues");
 
         var elevatorRequestValidationValuesValue =
             elevatorRequestValidationValuesField.GetValue(_elevatorConfigurationService);
@@ -89,18 +86,15 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
     [Test]
     public void Constructor_ObjectAssignments_Success()
     {
-        var configurationServiceField = GetNonPublicInstanceField<ElevatorConfigurationService>("_configurationService");
-        Assert.That(configurationServiceField, Is.Not.Null);
-
+        var configurationServiceField 
+            = GetNonPublicInstanceFieldNotNull<ElevatorConfigurationService>("_configurationService");
         var configurationServiceValue =
             configurationServiceField.GetValue(_elevatorConfigurationService);
 
         Assert.That(configurationServiceValue, Is.Not.Null);
         Assert.That(configurationServiceValue, Is.EqualTo(_mockConfigurationService.Object));
 
-        var mapperField = GetNonPublicInstanceField<ElevatorConfigurationService>("_mapper");
-        Assert.That(mapperField, Is.Not.Null);
-
+        var mapperField = GetNonPublicInstanceFieldNotNull<ElevatorConfigurationService>("_mapper");
         var mapperValue =
             mapperField.GetValue(_elevatorConfigurationService);
 
@@ -255,9 +249,8 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
 
         LoadConfiguration(elevatorsConfiguration, 3);
 
-        var elevatorRequestValidationValuesField = 
-            GetNonPublicInstanceField<ElevatorConfigurationService>("_elevatorRequestValidationValues");
-        Assert.That(elevatorRequestValidationValuesField, Is.Not.Null);
+        var elevatorRequestValidationValuesField =
+            GetNonPublicInstanceFieldNotNull<ElevatorConfigurationService>("_elevatorRequestValidationValues");
 
         var elevatorRequestValidationValues = elevatorRequestValidationValuesField.GetValue(_elevatorConfigurationService);
         Assert.That(elevatorRequestValidationValues, Is.Not.Null);
@@ -325,15 +318,13 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
             ElevatorsConfiguration = elevatorConfigurations
         };
 
-        var configurationField = GetNonPublicInstanceProperty<OtisConfigurationService>("_configuration");
-        Assert.That(configurationField, Is.Not.Null);
-
+        var configurationField = GetNonPublicInstancePropertyNotNull<OtisConfigurationService>("_configuration");
         configurationField.SetValue(_mockConfigurationService.Object, otisConfiguration);
 
         _elevatorConfigurationService.LoadConfiguration();
 
-        var elevatorsField = GetNonPublicInstanceField<ConcreteElevatorConfigurationServiceMock>("_elevators");
-        Assert.That(elevatorsField, Is.Not.Null);
+        var elevatorsField 
+            = GetNonPublicInstanceFieldNotNull<ConcreteElevatorConfigurationServiceMock>("_elevators");
 
         var elevatorsValue = elevatorsField.GetValue(_elevatorConfigurationService);
         Assert.That(elevatorsValue, Is.Not.Null);
