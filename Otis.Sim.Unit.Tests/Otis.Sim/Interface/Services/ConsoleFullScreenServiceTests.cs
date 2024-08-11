@@ -42,9 +42,7 @@ public class ConsoleFullScreenServiceTests : InterfaceTests
         {
             var value = field.GetValue(null);
             if (value == null)
-            {
                 Assert.Fail($"{field.Name} {TestConstants.HasAnEmptyValue}");
-            }
         }
     }
 

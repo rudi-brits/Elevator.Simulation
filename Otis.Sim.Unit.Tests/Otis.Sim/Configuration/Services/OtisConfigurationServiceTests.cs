@@ -1,11 +1,11 @@
-﻿using Otis.Sim.Configuration.Services;
-using Otis.Sim.Unit.Tests.Configuration;
-using Moq;
+﻿using Moq;
 using Moq.Protected;
+using Otis.Sim.Configuration.Models;
+using Otis.Sim.Configuration.Services;
+using Otis.Sim.Constants;
+using Otis.Sim.Unit.Tests.Configuration;
 using System.Text.Json;
 using MessageService = Otis.Sim.Messages.Services.ValidationMessageService;
-using Otis.Sim.Configuration.Models;
-using Otis.Sim.Constants;
 
 namespace Otis.Sim.Unit.Tests.Otis.Sim.Configuration.Services;
 

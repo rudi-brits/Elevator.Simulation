@@ -65,19 +65,12 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
     public void Field_DefaultValues()
     {
         var elevatorsField = GetNonPublicInstanceFieldNotNull<ConcreteElevatorConfigurationServiceMock>("_elevators");
-        var elevatorsValue =
-            elevatorsField.GetValue(_elevatorConfigurationService);
-
-        Assert.That(elevatorsValue, Is.Not.Null);
+        var elevatorsValue = ValidateFieldValue(elevatorsField, _elevatorConfigurationService);
         Assert.That(elevatorsValue, Is.EqualTo(new List<ElevatorModel>()));
 
         var elevatorRequestValidationValuesField =
             GetNonPublicInstanceFieldNotNull<ConcreteElevatorConfigurationServiceMock>("_elevatorRequestValidationValues");
-
-        var elevatorRequestValidationValuesValue =
-            elevatorRequestValidationValuesField.GetValue(_elevatorConfigurationService);
-
-        Assert.That(elevatorRequestValidationValuesValue, Is.Null);
+        ValidateFieldValue(elevatorRequestValidationValuesField, _elevatorConfigurationService, false);
     }
 
     /// <summary>
@@ -88,15 +81,11 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
     {
         var configurationServiceField 
             = GetNonPublicInstanceFieldNotNull<ElevatorConfigurationService>("_configurationService");
-        var configurationServiceValue =
-            configurationServiceField.GetValue(_elevatorConfigurationService);
-
-        Assert.That(configurationServiceValue, Is.Not.Null);
+        var configurationServiceValue = ValidateFieldValue(configurationServiceField, _elevatorConfigurationService);
         Assert.That(configurationServiceValue, Is.EqualTo(_mockConfigurationService.Object));
 
         var mapperField = GetNonPublicInstanceFieldNotNull<ElevatorConfigurationService>("_mapper");
-        var mapperValue =
-            mapperField.GetValue(_elevatorConfigurationService);
+        var mapperValue = ValidateFieldValue(mapperField, _elevatorConfigurationService);
 
         Assert.That(mapperValue, Is.Not.Null);
         Assert.That(mapperValue, Is.EqualTo(_mapper));
@@ -252,8 +241,8 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
         var elevatorRequestValidationValuesField =
             GetNonPublicInstanceFieldNotNull<ElevatorConfigurationService>("_elevatorRequestValidationValues");
 
-        var elevatorRequestValidationValues = elevatorRequestValidationValuesField.GetValue(_elevatorConfigurationService);
-        Assert.That(elevatorRequestValidationValues, Is.Not.Null);
+        var elevatorRequestValidationValues 
+            = ValidateFieldValue(elevatorRequestValidationValuesField, _elevatorConfigurationService);
 
         var model = elevatorRequestValidationValues as ElevatorRequestValidationValues;
 
@@ -325,9 +314,7 @@ public class ElevatorConfigurationServiceTests : ElevatorTests
 
         var elevatorsField 
             = GetNonPublicInstanceFieldNotNull<ConcreteElevatorConfigurationServiceMock>("_elevators");
-
-        var elevatorsValue = elevatorsField.GetValue(_elevatorConfigurationService);
-        Assert.That(elevatorsValue, Is.Not.Null);
+        var elevatorsValue = ValidateFieldValue(elevatorsField, _elevatorConfigurationService);
 
         var elevatorsModel = elevatorsValue as List<ElevatorModel>;
         Assert.That(elevatorsModel?.Count, Is.EqualTo(elevatorsCount));
