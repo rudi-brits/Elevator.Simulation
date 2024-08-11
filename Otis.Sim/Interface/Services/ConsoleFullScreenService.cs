@@ -34,23 +34,23 @@ public class ConsoleFullScreenService
     /// <summary>
     /// GWL_STYLE constant.
     /// </summary>
-    private static int GWL_STYLE      = -16;
+    private static readonly int GWL_STYLE      = -16;
     /// <summary>
     /// SW_MAXIMIZE constant.
     /// </summary>
-    private static int SW_MAXIMIZE    = 3;
+    private static readonly int SW_MAXIMIZE    = 3;
     /// <summary>
     /// WS_MAXIMIZEBOX constant.
     /// </summary>
-    private static int WS_MAXIMIZEBOX = 0x10000;
+    private static readonly int WS_MAXIMIZEBOX = 0x10000;
     /// <summary>
     /// WS_MINIMIZEBOX constant.
     /// </summary>
-    private static int WS_MINIMIZEBOX = 0x20000;
+    private static readonly int WS_MINIMIZEBOX = 0x20000;
     /// <summary>
     /// WS_SIZEBOX constant.
     /// </summary>
-    private static int WS_SIZEBOX     = 0x40000;
+    private static readonly int WS_SIZEBOX     = 0x40000;
 
     /// <summary>
     /// The InitialiseFullScreen function.

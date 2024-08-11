@@ -279,7 +279,7 @@ public class TerminalUiService : ConsoleFullScreenService
         }
         else
         {
-            ShowErrorMessageBox(response.Message);
+            ShowErrorMessageBox(response.Message ?? "An unforseen error has occurred");
         }
 
         SetOriginFloorInputFocus();

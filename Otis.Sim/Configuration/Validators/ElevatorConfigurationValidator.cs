@@ -39,7 +39,7 @@ public class ElevatorConfigurationValidator : AbstractValidator<ElevatorConfigur
     /// <param name="highestFloor"></param>
     /// <param name="lowestFloor"></param>
     /// <returns>The boolean result</returns>
-    private bool ValidateFloorDifference(int? highestFloor, int? lowestFloor)
+    private static bool ValidateFloorDifference(int? highestFloor, int? lowestFloor)
     {
         if (highestFloor.HasValue && lowestFloor.HasValue)
             return ((int)highestFloor).LargerThanByDifference((int)lowestFloor);

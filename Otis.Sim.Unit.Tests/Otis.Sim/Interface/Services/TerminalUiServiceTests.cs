@@ -274,7 +274,7 @@ public class TerminalUiServiceTests : InterfaceTests
         SetupInitialiseTableDataRefresh();
 
         var threadValue = GetRefreshDataThreadValue();
-        Assert.That(threadValue.IsAlive, Is.True);
+        Assert.That(threadValue?.IsAlive, Is.True);
     }
 
     /// <summary>

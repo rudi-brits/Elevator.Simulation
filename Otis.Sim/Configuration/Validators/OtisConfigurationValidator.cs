@@ -52,7 +52,7 @@ public class OtisConfigurationValidator : AbstractValidator<OtisConfiguration>
         if (elevators != null && elevators.Any())
         {
             var descriptions = elevators.Select(e => (e.Description ?? "").Trim()).ToList();
-            return descriptions.Distinct().Count() == descriptions.Count();
+            return descriptions.Distinct().Count() == descriptions.Count;
         }   
         return true;
     }

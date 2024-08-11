@@ -37,7 +37,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <param name="numberOfFailures"></param>
     /// <returns></returns>
-    protected List<ValidationFailure> GetMockValidationFailures(int numberOfFailures)
+    protected static List<ValidationFailure> GetMockValidationFailures(int numberOfFailures)
     {
         var failures = new List<ValidationFailure>();
         for (var i = 0; i < numberOfFailures; i++)
@@ -51,7 +51,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <param name="errorMessage"></param>
     /// <returns></returns>
-    protected int SplitByNewLineCharacterLength(string errorMessage)
+    protected static int SplitByNewLineCharacterLength(string errorMessage)
     {
         var errors = errorMessage.Split(new string[] { UtilityConstants.NewLineCharacter }, 
             StringSplitOptions.None);
@@ -63,7 +63,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>An array of <see cref="PropertyInfo"/></returns>
-    protected PropertyInfo[] GetPublicInstanceProperties<T>()
+    protected static PropertyInfo[] GetPublicInstanceProperties<T>()
         => typeof(T)
             .GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
@@ -73,7 +73,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns>An array of <see cref="PropertyInfo"/></returns>
-    protected PropertyInfo? GetPublicInstanceProperty<T>(string propertyName)
+    protected static PropertyInfo? GetPublicInstanceProperty<T>(string propertyName)
         => typeof(T)
             .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
 
@@ -83,7 +83,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns>An array of <see cref="PropertyInfo"/></returns>
-    protected PropertyInfo? GetNonPublicInstanceProperty<T>(string propertyName)
+    protected static PropertyInfo? GetNonPublicInstanceProperty<T>(string propertyName)
         => typeof(T)
             .GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -92,7 +92,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>An array of <see cref="PropertyInfo"/></returns>
-    protected PropertyInfo[] GetPublicStaticProperties<T>()
+    protected static PropertyInfo[] GetPublicStaticProperties<T>()
         => typeof(T)
             .GetProperties(BindingFlags.Public | BindingFlags.Static);
 
@@ -101,7 +101,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>An array of <see cref="FieldInfo"/></returns>
-    protected FieldInfo[] GetNonPublicStaticFields<T>()
+    protected static FieldInfo[] GetNonPublicStaticFields<T>()
         => typeof(T)
             .GetFields(BindingFlags.NonPublic | BindingFlags.Static);
 
@@ -110,7 +110,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>An array of <see cref="FieldInfo"/></returns>
-    protected FieldInfo[] GetNonPublicInstanceFields<T>()
+    protected static FieldInfo[] GetNonPublicInstanceFields<T>()
         => typeof(T)
             .GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -119,7 +119,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>An array of <see cref="FieldInfo"/></returns>
-    protected FieldInfo? GetPublicInstanceField<T>(string fieldName)
+    protected static FieldInfo? GetPublicInstanceField<T>(string fieldName)
         => typeof(T)
             .GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
 
@@ -128,7 +128,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>An array of <see cref="FieldInfo"/></returns>
-    protected FieldInfo? GetNonPublicInstanceField<T>(string fieldName)
+    protected static FieldInfo? GetNonPublicInstanceField<T>(string fieldName)
         => typeof(T)
             .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -137,7 +137,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="string"/></returns>
-    protected IEnumerable<string> GetPublicPropertyNames<T>()
+    protected static IEnumerable<string> GetPublicPropertyNames<T>()
         => GetPublicInstanceProperties<T>()
             .Select(prop => prop.Name);
 
@@ -145,7 +145,7 @@ public abstract class BaseTestService
     /// Gets an IEnumerable<FieldInfo> of public, static, literal fields.
     /// </summary>
     /// <returns>An array of <see cref="FieldInfo"/></returns>
-    protected IEnumerable<FieldInfo> GetPublicStaticLiteralFieldsInfo<T>()
+    protected static IEnumerable<FieldInfo> GetPublicStaticLiteralFieldsInfo<T>()
         => typeof(T)
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
             .Where(field => field.IsLiteral && !field.IsInitOnly);
@@ -154,7 +154,7 @@ public abstract class BaseTestService
     /// Gets MethodInfo of a public instance method.
     /// </summary>
     /// <returns>An array of <see cref="MethodInfo"/></returns>
-    protected MethodInfo? GetPublicInstanceMethod<T>(string methodName)
+    protected static MethodInfo? GetPublicInstanceMethod<T>(string methodName)
         => typeof(T)
             .GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
 
@@ -162,7 +162,7 @@ public abstract class BaseTestService
     /// Gets MethodInfo of a nonpublic instance method.
     /// </summary>
     /// <returns>An array of <see cref="MethodInfo"/></returns>
-    protected MethodInfo? GetNonPublicInstanceMethod<T>(string methodName)
+    protected static MethodInfo? GetNonPublicInstanceMethod<T>(string methodName)
         => typeof(T)
             .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -172,7 +172,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="typeName"></param>
     /// <returns></returns>
-    protected Type? GetNestedType<T>(string typeName)
+    protected static Type? GetNestedType<T>(string typeName)
         => typeof(T)
             .GetNestedType(typeName, BindingFlags.Public | BindingFlags.NonPublic);
 
@@ -182,7 +182,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns></returns>
-    protected FieldInfo GetPublicInstanceFieldNotNull<T>(string propertyName)
+    protected static FieldInfo GetPublicInstanceFieldNotNull<T>(string propertyName)
     {
         var field = GetPublicInstanceField<T>(propertyName);
         Assert.That(field, Is.Not.Null);
@@ -196,7 +196,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns></returns>
-    protected FieldInfo GetNonPublicInstanceFieldNotNull<T>(string fieldName)
+    protected static FieldInfo GetNonPublicInstanceFieldNotNull<T>(string fieldName)
     {
         var field = GetNonPublicInstanceField<T>(fieldName);
         Assert.That(field, Is.Not.Null);
@@ -210,7 +210,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns></returns>
-    protected PropertyInfo GetPublicInstancePropertyNotNull<T>(string propertyName)
+    protected static PropertyInfo GetPublicInstancePropertyNotNull<T>(string propertyName)
     {
         var property = GetPublicInstanceProperty<T>(propertyName);
         Assert.That(property, Is.Not.Null);
@@ -224,7 +224,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="propertyName"></param>
     /// <returns></returns>
-    protected PropertyInfo GetNonPublicInstancePropertyNotNull<T>(string propertyName)
+    protected static PropertyInfo GetNonPublicInstancePropertyNotNull<T>(string propertyName)
     {
         var property = GetNonPublicInstanceProperty<T>(propertyName);
         Assert.That(property, Is.Not.Null);
@@ -240,7 +240,7 @@ public abstract class BaseTestService
     /// <param name="elevatorModel"></param>
     /// <param name="isNotNull"></param>
     /// <returns></returns>
-    protected object? ValidateFieldValue<T>(FieldInfo fieldInfo, T elevatorModel, bool isNotNull = true)
+    protected static object? ValidateFieldValue<T>(FieldInfo fieldInfo, T elevatorModel, bool isNotNull = true)
     {
         var value = fieldInfo.GetValue(elevatorModel);
         AssertObjectNullability(value, isNotNull);
@@ -256,7 +256,7 @@ public abstract class BaseTestService
     /// <param name="elevatorModel"></param>
     /// <param name="isNotNull"></param>
     /// <returns></returns>
-    protected object? ValidatePropertyValue<T>(PropertyInfo propertyInfo, T elevatorModel, bool isNotNull = true)
+    protected static object? ValidatePropertyValue<T>(PropertyInfo propertyInfo, T elevatorModel, bool isNotNull = true)
     {
         var value = propertyInfo.GetValue(elevatorModel);
         AssertObjectNullability(value, isNotNull);
@@ -269,7 +269,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <param name="testObject"></param>
     /// <param name="isNotNull"></param>
-    protected void AssertObjectNullability(object? testObject, bool isNotNull)
+    protected static void AssertObjectNullability(object? testObject, bool isNotNull)
     {
         if (isNotNull)
             Assert.That(testObject, Is.Not.Null);
@@ -282,7 +282,7 @@ public abstract class BaseTestService
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="typeName"></param>
-    protected void GetNestedTypeNotNull<T>(string typeName)
+    protected static void GetNestedTypeNotNull<T>(string typeName)
     {
         var type = GetNestedType<T>(typeName);
         Assert.That(type, Is.Not.Null);
@@ -294,7 +294,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="methodName"></param>
     /// <returns></returns>
-    protected MethodInfo GetPublicInstanceMethodNotNull<T>(string methodName)
+    protected static MethodInfo GetPublicInstanceMethodNotNull<T>(string methodName)
     {
         var method = GetPublicInstanceMethod<T>(methodName);
         Assert.That(method, Is.Not.Null);
@@ -308,7 +308,7 @@ public abstract class BaseTestService
     /// <typeparam name="T"></typeparam>
     /// <param name="methodName"></param>
     /// <returns></returns>
-    protected MethodInfo GetNonPublicInstanceMethodNotNull<T>(string methodName)
+    protected static MethodInfo GetNonPublicInstanceMethodNotNull<T>(string methodName)
     {
         var method = GetNonPublicInstanceMethod<T>(methodName);
         Assert.That(method, Is.Not.Null);

@@ -147,11 +147,11 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// <summary>
     /// _primaryDirectionQueue
     /// </summary>
-    protected SortedSet<int> _primaryDirectionQueue = new SortedSet<int>();
+    protected SortedSet<int> _primaryDirectionQueue = new();
     /// <summary>
     /// _secondaryDirectionQueue
     /// </summary>
-    protected SortedSet<int> _secondaryDirectionQueue = new SortedSet<int>();
+    protected SortedSet<int> _secondaryDirectionQueue = new();
     /// <summary>
     /// _currentDirectionQueue
     /// </summary>
@@ -160,7 +160,7 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// <summary>
     /// _acceptedRequests
     /// </summary>
-    protected List<ElevatorAcceptedRequest> _acceptedRequests = new List<ElevatorAcceptedRequest>();
+    protected List<ElevatorAcceptedRequest> _acceptedRequests = new();
     /// <summary>
     /// _mapper
     /// </summary>

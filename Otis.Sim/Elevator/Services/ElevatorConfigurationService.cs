@@ -13,7 +13,7 @@ public abstract class ElevatorConfigurationService
     /// <summary>
     /// _elevators
     /// </summary>
-    protected List<ElevatorModel> _elevators = new List<ElevatorModel>();
+    protected List<ElevatorModel> _elevators = new();
     /// <summary>
     /// _elevatorRequestValidationValues
     /// </summary>

@@ -12,9 +12,9 @@ public class ReflectionHelperTests : HelperTests
     /// </summary>
     private class SampleTestClass
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PhysicalStreetAddress { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? PhysicalStreetAddress { get; set; }
         public int Age { get; set; }
     }
 
