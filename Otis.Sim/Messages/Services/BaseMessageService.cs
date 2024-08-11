@@ -1,10 +1,16 @@
-﻿namespace Otis.Sim.Messages.Services
+﻿namespace Otis.Sim.Messages.Services;
+
+/// <summary>
+/// BaseMessageService
+/// </summary>
+public class BaseMessageService
 {
-    public class BaseMessageService
-    {
-        public static string FormatMessage(string message, params string[] inputs)
-        {
-            return string.Format(message, inputs);
-        }
-    }
+    /// <summary>
+    /// FormatMessage
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="inputs"></param>
+    /// <returns></returns>
+    public static string FormatMessage(string message, params string[] inputs)
+        => string.Format(message, inputs);
 }

@@ -39,6 +39,14 @@ public class ElevatorModelMock : ElevatorModel
     /// </summary>
     public bool CalledOpenDoors = false;
     /// <summary>
+    /// CalledCloseDoors
+    /// </summary>
+    public bool CalledCloseDoors = false;
+    /// <summary>
+    /// CalledMoveToNextFloor
+    /// </summary>
+    public bool CalledMoveToNextFloor = false;
+    /// <summary>
     /// CalledHandleCompletedRequest
     /// </summary>
     public bool CalledHandleCompletedRequest = false;
@@ -46,6 +54,18 @@ public class ElevatorModelMock : ElevatorModel
     /// CalledHandleRequeueRequest
     /// </summary>
     public bool CalledHandleRequeueRequest = false;
+    /// <summary>
+    /// CalledRemoveAcceptedRequest
+    /// </summary>
+    public bool CalledRemoveAcceptedRequest = false;
+    /// <summary>
+    /// CalledCompleteRequest
+    /// </summary>
+    public bool CalledCompleteRequest = false;
+    /// <summary>
+    /// CalledRequeueRequest
+    /// </summary>
+    public bool CalledRequeueRequest = false;
 
     /// <summary>
     /// CallBaseIsFloorInRange field.
@@ -63,6 +83,26 @@ public class ElevatorModelMock : ElevatorModel
     /// CallBaseOpenDoors
     /// </summary>
     public bool CallBaseOpenDoors = false;
+    /// <summary>
+    /// CallBaseCloseDoors
+    /// </summary>
+    public bool CallBaseCloseDoors = false;
+    /// <summary>
+    /// CallBaseMoveToNextFloor
+    /// </summary>
+    public bool CallBaseMoveToNextFloor = false;
+    /// <summary>
+    /// CallBaseRemoveAcceptedRequest
+    /// </summary>
+    public bool CallBaseRemoveAcceptedRequest = false;
+    /// <summary>
+    /// CallBaseHandleRequeueRequest
+    /// </summary>
+    public bool CallBaseHandleCompletedRequest = false;
+    /// <summary>
+    /// CallBaseHandleRequeueRequest
+    /// </summary>
+    public bool CallBaseHandleRequeueRequest = false;
 
     /// <summary>
     /// IsFirstFloorInRangeMockReturnValue
@@ -95,6 +135,12 @@ public class ElevatorModelMock : ElevatorModel
     {
     }
 
+    /// <summary>
+    /// ElevatorModelMock constructor
+    /// </summary>
+    /// <param name="mapper"></param>
+    /// <param name="floorMoveTimer"></param>
+    /// <param name="doorsOpenTimer"></param>
     public ElevatorModelMock(IMapper mapper, Timer floorMoveTimer, Timer doorsOpenTimer)
         : base(mapper, floorMoveTimer, doorsOpenTimer)
     {
@@ -103,8 +149,23 @@ public class ElevatorModelMock : ElevatorModel
             CalledPrintRequestStatus = true;
             PrintRequestStatusMessage = message;
         };
+
+        CompleteRequest = (Guid requestId) =>
+        {
+            CalledCompleteRequest = true;
+        };
+
+        RequeueRequest = (Guid requestId) =>
+        {
+            CalledRequeueRequest = true;
+        };
     }
 
+    /// <summary>
+    /// IsFloorInRange
+    /// </summary>
+    /// <param name="floor"></param>
+    /// <returns></returns>
     protected override bool IsFloorInRange(int floor)
     {
         CalledIsFloorInRange = true;
@@ -120,6 +181,12 @@ public class ElevatorModelMock : ElevatorModel
         return IsFirstFloorInRangeMockReturnValue;
     }
 
+    /// <summary>
+    /// IsSameDirectionOnRoute
+    /// </summary>
+    /// <param name="requestOriginFloor"></param>
+    /// <param name="requestDirection"></param>
+    /// <returns></returns>
     protected override bool IsSameDirectionOnRoute(int requestOriginFloor, ElevatorDirection requestDirection)
     {
         CalledIsSameDirectionOnRoute = true;
@@ -129,6 +196,12 @@ public class ElevatorModelMock : ElevatorModel
         return IsSameDirectionOnRouteMockReturnValue;
     }
 
+    /// <summary>
+    /// IsFloorAndDirectionValid
+    /// </summary>
+    /// <param name="originFloor"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
     protected override bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
     {
         CalledIsFloorAndDirectionValid = true;
@@ -138,6 +211,9 @@ public class ElevatorModelMock : ElevatorModel
         return IsFloorAndDirectionValidMockReturnValue;
     }
 
+    /// <summary>
+    /// OpenDoors
+    /// </summary>
     protected override void OpenDoors()
     {
         CalledOpenDoors = true;
@@ -145,25 +221,75 @@ public class ElevatorModelMock : ElevatorModel
             base.OpenDoors();
     }
 
+    /// <summary>
+    /// CloseDoors
+    /// </summary>
+    /// <param name="state"></param>
+    protected override void CloseDoors(object? state)
+    {
+        CalledCloseDoors = true;
+        if (CallBaseCloseDoors)
+            base.CloseDoors(state);
+    }
+
+    /// <summary>
+    /// MoveToNextFloor
+    /// </summary>
+    protected override void MoveToNextFloor()
+    {
+        CalledMoveToNextFloor = true;
+        if (CallBaseMoveToNextFloor)
+            base.MoveToNextFloor();
+    }
+
+    /// <summary>
+    /// MoveElevator
+    /// </summary>
     protected override void MoveElevator()
     {
         CalledMoveElevator = true;
         _isMoving = true;
     }
 
+    /// <summary>
+    /// StopElevator
+    /// </summary>
     protected override void StopElevator()
     {
         CalledStopElevator = true;
         _isMoving = false;
     }
 
+    /// <summary>
+    /// HandleCompletedRequest
+    /// </summary>
+    /// <param name="request"></param>
     protected override void HandleCompletedRequest(ElevatorAcceptedRequest request)
     {
         CalledHandleCompletedRequest = true;
+        if (CallBaseHandleCompletedRequest)
+            base.HandleCompletedRequest(request);
     }
 
+    /// <summary>
+    /// HandleRequeueRequest
+    /// </summary>
+    /// <param name="request"></param>
     protected override void HandleRequeueRequest(ElevatorAcceptedRequest request)
     {
         CalledHandleRequeueRequest = true;
+        if (CallBaseHandleRequeueRequest)
+            base.HandleRequeueRequest(request);
+    }
+
+    /// <summary>
+    /// RemoveAcceptedRequest
+    /// </summary>
+    /// <param name="id"></param>
+    protected override void RemoveAcceptedRequest(Guid id)
+    {
+        CalledRemoveAcceptedRequest = true;
+        if (CallBaseRemoveAcceptedRequest)
+            base.RemoveAcceptedRequest(id);
     }
 }

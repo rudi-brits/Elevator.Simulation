@@ -333,6 +333,9 @@ public class ElevatorModel : ElevatorConfigurationBase
         }
     }
 
+    /// <summary>
+    /// OpenDoors
+    /// </summary>
     protected virtual void OpenDoors()
     {
         _currentStatus = ElevatorStatus.DoorsOpen;
@@ -381,12 +384,19 @@ public class ElevatorModel : ElevatorConfigurationBase
         }
     }
 
+    /// <summary>
+    /// CloseDoors
+    /// </summary>
+    /// <param name="state"></param>
     protected virtual void CloseDoors(object? state)
     {
         _doorsOpenTimer.Change(Timeout.Infinite, Timeout.Infinite);
         MoveToNextFloor();
     }
 
+    /// <summary>
+    /// MoveToNextFloor
+    /// </summary>
     protected virtual void MoveToNextFloor()
     {
         if (NextFloor == null)
@@ -398,18 +408,28 @@ public class ElevatorModel : ElevatorConfigurationBase
             MoveElevator();
     }
 
+    /// <summary>
+    /// MoveElevator
+    /// </summary>
     protected virtual void MoveElevator()
     {
         _floorMoveTimer.Change(0, FloorMoveTime);
         _isMoving = true;
     }
 
+    /// <summary>
+    /// StopElevator
+    /// </summary>
     protected virtual void StopElevator()
     {
         _floorMoveTimer.Change(Timeout.Infinite, Timeout.Infinite);
         _isMoving = false;
     }
 
+    /// <summary>
+    /// HandleCompletedRequest
+    /// </summary>
+    /// <param name="request"></param>
     protected virtual void HandleCompletedRequest(ElevatorAcceptedRequest request)
     {
         if (request.Completed)
@@ -421,6 +441,10 @@ public class ElevatorModel : ElevatorConfigurationBase
         }
     }
 
+    /// <summary>
+    /// HandleRequeueRequest
+    /// </summary>
+    /// <param name="request"></param>
     protected virtual void HandleRequeueRequest(ElevatorAcceptedRequest request)
     {
         RemoveAcceptedRequest(request.Id);
@@ -429,6 +453,10 @@ public class ElevatorModel : ElevatorConfigurationBase
         PrintRequestStatus!(request.ToRequeuedRequestString());
     }
 
+    /// <summary>
+    /// RemoveAcceptedRequest
+    /// </summary>
+    /// <param name="id"></param>
     protected virtual void RemoveAcceptedRequest(Guid id)
     {
         _acceptedRequests = _acceptedRequests
@@ -436,6 +464,10 @@ public class ElevatorModel : ElevatorConfigurationBase
            .ToList();
     }
 
+    /// <summary>
+    /// ToString
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         return $"{nameof(Description)}: {Description}, " +

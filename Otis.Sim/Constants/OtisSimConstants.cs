@@ -57,4 +57,8 @@ public class OtisSimConstants
     /// Requeued string constant
     /// </summary>
     public const string Requeued             = "Requeued";
+    /// <summary>
+    /// Error processing request
+    /// </summary>
+    public const string ErrorProcessingRequest = "Error processing request";
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Otis.Sim.Configuration.Services;
+using Otis.Sim.Constants;
 using Otis.Sim.Elevator.Models;
 using Otis.Sim.Elevator.Validators;
 using Otis.Sim.Utilities.Helpers;
@@ -7,206 +8,269 @@ using System.Diagnostics;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 using MessageService = Otis.Sim.Messages.Services.ValidationMessageService;
 
-namespace Otis.Sim.Elevator.Services
+namespace Otis.Sim.Elevator.Services;
+
+/// <summary>
+/// Class ElevatorControllerService extends the <see cref="ElevatorConfigurationService" /> class.
+/// </summary>
+public class ElevatorControllerService : ElevatorConfigurationService
 {
-    public class ElevatorControllerService : ElevatorConfigurationService
+    /// <summary>
+    /// ElevatorTableHeaders
+    /// </summary>
+    public List<string> ElevatorTableHeaders => ReflectionHelper.GetFormattedPropertyNames<ElevatorDataRow>();
+    /// <summary>
+    /// ElevatorDataRows
+    /// </summary>
+    public List<ElevatorDataRow> ElevatorDataRows => _mapper.Map<List<ElevatorDataRow>>(_elevators);
+    /// <summary>
+    /// StatusFieldName
+    /// </summary>
+    public string StatusFieldName => nameof(ElevatorDataRow.Status);
+    /// <summary>
+    /// _requestQueue
+    /// </summary>
+    protected Queue<ElevatorRequest> _requestQueue;
+    /// <summary>
+    /// _completedRequestIds
+    /// </summary>
+    protected HashSet<Guid> _completedRequestIds;
+    /// <summary>
+    /// _lockRequestQueue
+    /// </summary>
+    protected readonly object _lockRequestQueue;
+    /// <summary>
+    /// _cancellationTokenSource
+    /// </summary>
+    protected CancellationTokenSource _cancellationTokenSource;
+    /// <summary>
+    /// _requestConsumerTask
+    /// </summary>
+    protected Task _requestConsumerTask;
+    /// <summary>
+    /// UpdateRequestStatusDelegate type
+    /// </summary>
+    /// <param name="message"></param>
+    public delegate void UpdateRequestStatusDelegate(string message);
+    /// <summary>
+    /// UpdateRequestStatus
+    /// </summary>
+    public UpdateRequestStatusDelegate? UpdateRequestStatus;
+
+    /// <summary>
+    /// ElevatorControllerService constructor
+    /// </summary>
+    /// <param name="configurationService"></param>
+    /// <param name="mapper"></param>
+    public ElevatorControllerService(OtisConfigurationService configurationService,
+        IMapper mapper): base(configurationService, mapper)
+    {   
+        _mapper = mapper;
+
+        _requestQueue        = new Queue<ElevatorRequest>();
+        _completedRequestIds = new HashSet<Guid>();
+        _lockRequestQueue    = new object();
+
+        _cancellationTokenSource = new CancellationTokenSource();
+        _requestConsumerTask     = RunRequestQueueConsumer();
+    }
+
+    /// <summary>
+    /// RunRequestQueueConsumer
+    /// </summary>
+    /// <returns></returns>
+    protected virtual Task RunRequestQueueConsumer()
+        => Task.Run(() => RequestQueueConsumer());
+
+    /// <summary>
+    /// Exit
+    /// </summary>
+    public void Exit()
     {
-        public List<string> ElevatorTableHeaders => ReflectionHelper.GetFormattedPropertyNames<ElevatorDataRow>();
-        public List<ElevatorDataRow> ElevatorDataRows => _mapper.Map<List<ElevatorDataRow>>(_elevators);
+        _cancellationTokenSource.Cancel();
+        _requestConsumerTask.Wait();
+    }
 
-        public string StatusFieldName => nameof(ElevatorDataRow.Status);
+    /// <summary>
+    /// RequestElevator
+    /// </summary>
+    /// <param name="userInputRequest"></param>
+    /// <returns></returns>
+    public virtual ElevatorRequestResult RequestElevator(UserInputRequest userInputRequest)
+    {
+        var userInputValidationResult = ValidateUserInputRequest(userInputRequest);
+        if (userInputValidationResult != null)
+            return userInputValidationResult;
 
-        private Queue<ElevatorRequest> _requestQueue;
-        private HashSet<Guid> _completedRequestIds;
-        private readonly object _lockRequestQueue;
+        var elevatorRequest = new ElevatorRequest(userInputRequest);
 
-        private CancellationTokenSource _cancellationTokenSource;
-        private Task _requestConsumerTask;
+        return ValidateElevatorRequest(elevatorRequest)
+            ?? ValidateDuplicateElevatorRequest(elevatorRequest)
+            ?? new ElevatorRequestResult(true);
+    }
 
-        public delegate void UpdateRequestStatusDelegate(string message);
-        public UpdateRequestStatusDelegate UpdateRequestStatus;
+    /// <summary>
+    /// ValidateUserInputRequest
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    protected virtual ElevatorRequestResult? ValidateUserInputRequest(UserInputRequest request)
+    {
+        var validationResult = new UserInputRequestValidator()
+            .Validate(request);
 
-        public ElevatorControllerService(OtisConfigurationService configurationService,
-            IMapper mapper): base(configurationService, mapper)
-        {   
-            _mapper = mapper;
+        if (!validationResult.IsValid)
+            return new ElevatorRequestResult(validationResult.Errors);
 
-            _requestQueue = new Queue<ElevatorRequest>();
-            _completedRequestIds = new HashSet<Guid>();
-            _lockRequestQueue = new object();
+        return null;
+    }
 
-            _cancellationTokenSource = new CancellationTokenSource();
-            _requestConsumerTask = Task.Run(() => RequestQueueConsumer(_cancellationTokenSource.Token));
-        }
+    /// <summary>
+    /// ValidateElevatorRequest
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    protected virtual ElevatorRequestResult? ValidateElevatorRequest(ElevatorRequest request)
+    {
+        var validationResult = new ElevatorRequestValidator(_elevatorRequestValidationValues!)
+            .Validate(request);
 
-        public void Exit()
+        if (!validationResult.IsValid)
+            return new ElevatorRequestResult(validationResult.Errors);
+
+        return null;
+    }
+
+    /// <summary>
+    /// ValidateDuplicateElevatorRequest
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    protected virtual ElevatorRequestResult? ValidateDuplicateElevatorRequest(ElevatorRequest request)
+    {
+        var isAlreadyQueued = _requestQueue.Any(queueRequest =>
+            queueRequest.OriginFloor      == request.OriginFloor &&
+            queueRequest.DestinationFloor == request.DestinationFloor &&
+            queueRequest.Direction        == request.Direction &&
+            queueRequest.RequestStatus    == RequestStatus.Pending);
+
+        if (isAlreadyQueued)
         {
-            _cancellationTokenSource.Cancel();
-            _requestConsumerTask.Wait();
+            var message = MessageService.FormatMessage(
+                MessageService.DuplicateElevatorRequest,
+                request.OriginFloor.ToString(),
+                request.DestinationFloor.ToString(),
+                request.Direction.ToString());
+
+            return new ElevatorRequestResult(false, message);
         }
 
-        public virtual ElevatorRequestResult RequestElevator(UserInputRequest userInputRequest)
+        RequestQueueProducer(request);
+
+        return null;
+    }
+
+    /// <summary>
+    /// RequestQueueProducer
+    /// </summary>
+    /// <param name="request"></param>
+    protected virtual void RequestQueueProducer(ElevatorRequest request)
+    {
+        lock (_lockRequestQueue)
         {
-            var userInputValidationResult = ValidateUserInputRequest(userInputRequest);
-            if (userInputValidationResult != null)
-                return userInputValidationResult;
-
-            var elevatorRequest = new ElevatorRequest(userInputRequest);
-
-            return ValidateElevatorRequest(elevatorRequest)
-                ?? ValidateDuplicateElevatorRequest(elevatorRequest)
-                ?? new ElevatorRequestResult(true);
+            _requestQueue.Enqueue(request);
         }
 
-        private ElevatorRequestResult? ValidateUserInputRequest(UserInputRequest request)
-        {
-            var validationResult = new UserInputRequestValidator()
-                .Validate(request);
+        PrintRequestStatus(request.ToQueuedRequestString());
+    }
 
-            if (!validationResult.IsValid)
-                return new ElevatorRequestResult(validationResult.Errors);
-
-            return null;
-        }
-
-        private ElevatorRequestResult? ValidateElevatorRequest(ElevatorRequest request)
-        {
-            var validationResult = new ElevatorRequestValidator(_elevatorRequestValidationValues)
-                .Validate(request);
-
-            if (!validationResult.IsValid)
-                return new ElevatorRequestResult(validationResult.Errors);
-
-            return null;
-        }
-
-        private ElevatorRequestResult? ValidateDuplicateElevatorRequest(ElevatorRequest request)
-        {
-            var isAlreadyQueued = _requestQueue.Any(queueRequest =>
-                queueRequest.OriginFloor      == request.OriginFloor &&
-                queueRequest.DestinationFloor == request.DestinationFloor &&
-                queueRequest.Direction        == request.Direction &&
-                queueRequest.RequestStatus    == RequestStatus.Pending);
-
-            if (isAlreadyQueued)
-            {
-                var message = MessageService.FormatMessage(
-                    MessageService.DuplicateElevatorRequest,
-                    request.ToDuplicateRequestString());
-
-                return new ElevatorRequestResult(false, message);
-            }
-
-            RequestQueueProducer(request);
-
-            return null;
-        }
-        private void RequestQueueProducer(ElevatorRequest request)
+    /// <summary>
+    /// RequestQueueConsumer
+    /// </summary>
+    protected virtual void RequestQueueConsumer()
+    {
+        while (!_cancellationTokenSource.IsCancellationRequested)
         {
             lock (_lockRequestQueue)
             {
-                _requestQueue.Enqueue(request);
+                RequestElevatorAssignment();
+                Thread.Sleep(150);
             }
-
-            PrintRequestStatus(request.ToQueuedRequestString());
         }
+    }
 
-        private void RequestQueueConsumer(CancellationToken cancellationToken)
+    /// <summary>
+    /// RequestElevatorAssignment
+    /// </summary>
+    protected virtual void RequestElevatorAssignment()
+    {
+        try
         {
-            while (!cancellationToken.IsCancellationRequested)
+            if (_requestQueue.Count > 0 && _requestQueue.TryDequeue(out ElevatorRequest? request))
             {
-                lock (_lockRequestQueue)
+                if (_completedRequestIds.Any(id => id == request.Id))
+                    _completedRequestIds.Remove(request.Id);
+
+                else
                 {
-                    try
+                    if (request.RequestStatus == RequestStatus.Pending)
                     {
-                        if (_requestQueue.Count > 0 && _requestQueue.TryDequeue(out ElevatorRequest? request))
+                        var elevatorId = RequestElevator(request);
+                        if (elevatorId != null)
                         {
-                            if (_completedRequestIds.Any(id => id == request.Id))
-                                _completedRequestIds.Remove(request.Id);
-
-                            else
-                            {
-                                if (request.RequestStatus == RequestStatus.Pending)
-                                {
-                                    var elevatorId = RequestElevator(request);
-                                    if (elevatorId != null)
-                                    {
-                                        request.ElevatorId = elevatorId;
-                                    }
-                                }
-
-                                _requestQueue.Enqueue(request);
-                            }
+                            request.ElevatorId = elevatorId;
                         }
                     }
-                    catch (Exception exc)
-                    {
-                        PrintRequestStatus($"Error processing request {exc}");
-                    }
 
-                    Thread.Sleep(150);
+                    _requestQueue.Enqueue(request);
                 }
             }
         }
-
-        private int? RequestElevator(ElevatorRequest request)
+        catch (Exception exc)
         {
-            var elevator = _elevators
-                .Where
-                (
-                    elevator => elevator.CanAcceptRequest(request)
-                )
-                .OrderBy(elevator => Math.Abs(elevator.CurrentFloor - request.OriginFloor))
-                .FirstOrDefault();
-
-            _elevators
-                .Where(elevator => elevator.CanAcceptRequest(request))
-                .Select(elevator => new
-                {
-                    Elevator = elevator,
-                    Distance = Math.Abs(elevator.CurrentFloor - request.OriginFloor)
-                })
-                .OrderBy(result => result.Distance)
-                .ToList()
-                .ForEach(result =>
-                {
-                    Debug.WriteLine($"{result.Elevator.Description}, Status: {result.Elevator.CurrentStatus}, " +
-                        $"OtisSimConstants.Capacity: {result.Elevator.Capacity}, CurrentFloor: {result.Elevator.CurrentFloor}, " +
-                        $"Request from: {request.OriginFloor}, Request to: {request.DestinationFloor}, " +
-                        $"Request direction: {request.Direction}, " + 
-                        $"Distance: {result.Distance}");
-                });
-
-            if (elevator != null && elevator.AcceptRequest(request))
-                return elevator.Id;
-
-            return null;
+            PrintRequestStatus($"{OtisSimConstants.ErrorProcessingRequest} {exc}");
         }
+    }
 
-        protected override void CompleteRequest(Guid requestId)
+    protected virtual int? RequestElevator(ElevatorRequest request)
+    {
+        var elevator = _elevators
+            .Where
+            (
+                elevator => elevator.CanAcceptRequest(request)
+            )
+            .OrderBy(elevator => Math.Abs(elevator.CurrentFloor - request.OriginFloor))
+            .FirstOrDefault();
+
+        if (elevator != null && elevator.AcceptRequest(request))
+            return elevator.Id;
+
+        return null;
+    }
+
+    protected override void CompleteRequest(Guid requestId)
+    {
+        lock (_lockRequestQueue)
         {
-            lock (_lockRequestQueue)
-            {
-                if (!_completedRequestIds.Any(id => id == requestId))
-                    _completedRequestIds.Add(requestId);
-            }
+            if (!_completedRequestIds.Any(id => id == requestId))
+                _completedRequestIds.Add(requestId);
         }
+    }
 
-        protected override void RequeueRequest(Guid requestId)
+    protected override void RequeueRequest(Guid requestId)
+    {
+        lock (_lockRequestQueue)
         {
-            lock (_lockRequestQueue)
-            {
-                var request = _requestQueue
-                    .FirstOrDefault(request => request.Id == requestId);
+            var request = _requestQueue
+                .FirstOrDefault(request => request.Id == requestId);
 
-                if (request != null)
-                    request.ElevatorId = null;
-            }
+            if (request != null)
+                request.ElevatorId = null;
         }
+    }
 
-        protected override void PrintRequestStatus(string message)
-        {
-            UpdateRequestStatus?.Invoke($"{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff")} - {message}");
-        }
+    protected override void PrintRequestStatus(string message)
+    {
+        UpdateRequestStatus?.Invoke($"{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff")} - {message}");
     }
 }
