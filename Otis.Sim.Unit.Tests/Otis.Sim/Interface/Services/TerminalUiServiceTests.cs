@@ -112,7 +112,9 @@ public class TerminalUiServiceTests : InterfaceTests
         methodInfo.Invoke(_mockTerminalUiService, null);
 
         TestNonPublicPropertyValueNotNull("_globalColorScheme");
-        TestNonPublicPropertyValueNotNull("_idleColorScheme");
+        TestNonPublicPropertyValueNotNull("_movingUpColorSchema");
+        TestNonPublicPropertyValueNotNull("_movingDownColorSchema");
+        TestNonPublicPropertyValueNotNull("_doorsOpenColorScheme");
     }
 
     /// <summary>

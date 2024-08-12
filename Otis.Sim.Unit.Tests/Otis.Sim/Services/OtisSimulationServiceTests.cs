@@ -113,6 +113,8 @@ public class OtisSimulationServiceTests : BaseTestService
 
         var successPrefixValue = GetSuccessPrefixValue();
         Assert.That(successPrefixValue, Is.Not.Null.Or.Empty);
+
+        Assert.That(_otisSimulationServiceMock.CalledRunSimulation, Is.True);
     }
 
     /// <summary>
