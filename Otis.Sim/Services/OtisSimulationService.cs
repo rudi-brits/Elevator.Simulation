@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Otis.Sim.Configuration.Services;
+using Otis.Sim.Constants;
 using Otis.Sim.Elevator.Services;
 using Otis.Sim.Interface.Interfaces;
 using Otis.Sim.Interface.Models;
@@ -51,18 +52,21 @@ public class OtisSimulationService
         catch (Exception exc)
         {
             Console.WriteLine();
-            Console.WriteLine($"Application startup failed: {exc.Message}");
+            WriteLineToConsole($"{OtisSimConstants.ApplicationStartupFailedMessage} {exc.Message}");
             
             if (!string.IsNullOrWhiteSpace(exc.InnerException?.Message))
-            { 
-                Console.WriteLine(exc.InnerException.Message);
+            {
+                WriteLineToConsole(exc.InnerException.Message);
             }
         }
 
-        DisplayUserInputMessage($"Press any key to {(initialisedSuccess ? "continue" : "exit")}...");
-
         if (initialisedSuccess)
+        {
+            DisplayUserInputMessage(OtisSimConstants.PressAnyKeyToContinueMessage);
             InitialiseTerminalUi();
+        } 
+        else
+            DisplayUserInputMessage(OtisSimConstants.PressAnyKeyToExitMessage);
     }
 
     /// <summary>
@@ -136,6 +140,9 @@ public class OtisSimulationService
         }
     }
 
+    /// <summary>
+    /// InitialiseTerminalUi
+    /// </summary>
     protected virtual void InitialiseTerminalUi()
     {
         try
@@ -145,25 +152,53 @@ public class OtisSimulationService
         }
         catch (Exception exc)
         {
-            DisplayUserInputMessage($"UI initialisation failed. Press any key to exit - {exc.Message}");
+            DisplayUserInputMessage($"{OtisSimConstants.ErrorInitialiseTerminalUi} {exc.Message}");
         }
     }
 
+    /// <summary>
+    /// SetupServiceCollectionMessage
+    /// </summary>
+    /// <param name="isSuccess"></param>
+    /// <returns></returns>
     protected virtual string SetupServiceCollectionMessage(bool isSuccess = true)
-        => $"{GetPrefix(isSuccess)} setup services and service provider";
+        => $"{GetPrefix(isSuccess)} {OtisSimConstants.SetupServiceCollectionResultMessage}";
 
+    /// <summary>
+    /// LoadAppConfigurationMessage
+    /// </summary>
+    /// <param name="isSuccess"></param>
+    /// <returns></returns>
     protected virtual string LoadAppConfigurationMessage(bool isSuccess = true)
-        => $"{GetPrefix(isSuccess)} load app configuration from appsettings";
+        => $"{GetPrefix(isSuccess)} {OtisSimConstants.LoadAppConfigurationResultMessage}";
 
+    /// <summary>
+    /// LoadElevatorControllerConfigurationMessage
+    /// </summary>
+    /// <param name="isSuccess"></param>
+    /// <returns></returns>
     protected virtual string LoadElevatorControllerConfigurationMessage(bool isSuccess = true)
-        => $"{GetPrefix(isSuccess)} load elevator configuration";
+        => $"{GetPrefix(isSuccess)} {OtisSimConstants.LoadElevatorConfigurationResultMessage}";
 
+    /// <summary>
+    /// GetPrefix
+    /// </summary>
+    /// <param name="isSuccess"></param>
+    /// <returns></returns>
     protected virtual string GetPrefix(bool isSuccess = true)
         => isSuccess ? SuccessPrefix : "";
 
+    /// <summary>
+    /// WriteLineToConsole
+    /// </summary>
+    /// <param name="message"></param>
     protected virtual void WriteLineToConsole(string message)
         => Console.WriteLine(message);
 
+    /// <summary>
+    /// DisplayUserInputMessage
+    /// </summary>
+    /// <param name="message"></param>
     protected virtual void DisplayUserInputMessage(string message)
     {
         Console.WriteLine(message);

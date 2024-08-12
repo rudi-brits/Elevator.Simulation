@@ -50,11 +50,7 @@ public class TerminalUiServiceTests : InterfaceTests
         _mockElevatorControllerService = new Mock<ElevatorControllerService>(
             _mockConfigurationService.Object, _mapper);
 
-        _mockTerminalGuiApplication = new Mock<ISimTerminalGuiApplication>();
-        _mockTerminalGuiApplication.Setup(x => x.Init()).Verifiable();
-        _mockTerminalGuiApplication.Setup(x => x.Top).Returns(new Toplevel());
-        _mockTerminalGuiApplication.Setup(x => x.Run()).Verifiable();
-        _mockTerminalGuiApplication.Setup(x => x.Invoke(It.IsAny<Action>())).Callback<Action>(a => a.Invoke());
+        _mockTerminalGuiApplication = BuildMockTerminalGuiApplication();
     }   
 
     /// <summary>

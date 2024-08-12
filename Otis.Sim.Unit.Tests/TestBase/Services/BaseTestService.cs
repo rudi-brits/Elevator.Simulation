@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using FluentValidation.Results;
+using Moq;
+using Otis.Sim.Interface.Interfaces;
 using Otis.Sim.MappingProfiles;
 using Otis.Sim.Utilities.Constants;
 using System.Reflection;
+using Terminal.Gui;
 
 namespace Otis.Sim.Unit.Tests.TestBase.Services;
 
@@ -30,6 +33,21 @@ public abstract class BaseTestService
         var mapper = OtisMapperConfiguration.CreateMapper();
 
         return mapper;
+    }
+
+    /// <summary>
+    /// SetupMockTerminalGuiApplication
+    /// </summary>
+    /// <returns>The <see cref="Mock" /> <see cref="ISimTerminalGuiApplication" />result</returns>
+    protected Mock<ISimTerminalGuiApplication> BuildMockTerminalGuiApplication()
+    {
+        var mockTerminalGuiApplication = new Mock<ISimTerminalGuiApplication>();
+        mockTerminalGuiApplication.Setup(x => x.Init()).Verifiable();
+        mockTerminalGuiApplication.Setup(x => x.Top).Returns(new Toplevel());
+        mockTerminalGuiApplication.Setup(x => x.Run()).Verifiable();
+        mockTerminalGuiApplication.Setup(x => x.Invoke(It.IsAny<Action>())).Callback<Action>(a => a.Invoke());
+
+        return mockTerminalGuiApplication;
     }
 
     /// <summary>

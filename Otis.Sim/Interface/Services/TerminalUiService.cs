@@ -78,7 +78,7 @@ public class TerminalUiService : ConsoleFullScreenService
     /// <summary>
     /// InitialiseUi function
     /// </summary>
-    public void InitialiseUi()
+    public virtual void InitialiseUi()
     {
         InitialiseColorSchemes();
         InitialiseFullScreen();
@@ -345,9 +345,8 @@ public class TerminalUiService : ConsoleFullScreenService
             AddElevatorRows();
             _elevatorsTableView.SetNeedsDisplay();
         }
-        catch(Exception exc)
+        catch(Exception)
         {
-
         }
     }
 
