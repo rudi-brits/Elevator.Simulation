@@ -26,7 +26,7 @@ The configuration loading process involves the following steps:
 3. Validation: The OtisConfigurationValidator validates the deserialized object to ensure it is correctly structured.
 4. Application: If valid, the configuration is applied to the service. If invalid, an exception is thrown.
 
-NOTE: Elevators are allowed to have their own floor configuraions within the bounds of the building.
+NOTE: Elevators are allowed to have their own floor configurations within the bounds of the building.
 
 UI Overview - 
 The Otis Simulation Service includes a user interface (UI) built using the Terminal.Gui library. 
