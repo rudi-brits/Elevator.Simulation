@@ -43,7 +43,7 @@ public abstract class ElevatorConfigurationService
     /// <summary>
     /// LoadConfiguration function
     /// </summary>
-    public void LoadConfiguration()
+    public virtual void LoadConfiguration()
     {
         var elevatorId = 0;
         var buildingConfiguration = _configurationService.BuildingConfiguration!;

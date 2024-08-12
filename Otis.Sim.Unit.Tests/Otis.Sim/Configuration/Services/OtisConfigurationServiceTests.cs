@@ -26,6 +26,9 @@ public class OtisConfigurationServiceTests : ConfigurationTests
     public void Setup()
     {
         _mockOtisConfigurationService = new Mock<OtisConfigurationService>();
+        _mockOtisConfigurationService
+            .Setup(service => service.LoadConfiguration())
+            .CallBase();
     }
 
     /// <summary>

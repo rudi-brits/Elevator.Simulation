@@ -96,16 +96,20 @@ public class OtisSimulationService
         {
             throw new Exception(SetupServiceCollectionMessage(false), exc);
         }
-    }    
+    }
 
+    /// <summary>
+    /// LoadAppConfiguration
+    /// </summary>
+    /// <exception cref="Exception"></exception>
     protected virtual void LoadAppConfiguration()
     {
         try
         {
-            var otisConfigurationService = _serviceProvider?.GetService<OtisConfigurationService>();
-            otisConfigurationService?.LoadConfiguration();
+            var otisConfigurationService = _serviceProvider!.GetService<OtisConfigurationService>();
+            otisConfigurationService!.LoadConfiguration();
 
-            Console.WriteLine(LoadAppConfigurationMessage());
+            WriteLineToConsole(LoadAppConfigurationMessage());
         }
         catch (Exception exc)
         {
@@ -113,14 +117,18 @@ public class OtisSimulationService
         }
     }
 
+    /// <summary>
+    /// LoadElevatorControllerConfiguration
+    /// </summary>
+    /// <exception cref="Exception"></exception>
     protected virtual void LoadElevatorControllerConfiguration()
     {
         try
         {
-            var elevatorControllerService = _serviceProvider?.GetService<ElevatorControllerService>();
-            elevatorControllerService?.LoadConfiguration();
+            var elevatorControllerService = _serviceProvider!.GetService<ElevatorControllerService>();
+            elevatorControllerService!.LoadConfiguration();
 
-            Console.WriteLine(LoadElevatorControllerConfigurationMessage());
+            WriteLineToConsole(LoadElevatorControllerConfigurationMessage());
         }
         catch (Exception exc)
         {
@@ -132,8 +140,8 @@ public class OtisSimulationService
     {
         try
         { 
-            var terminalUiService = _serviceProvider?.GetService<TerminalUiService>();
-            terminalUiService?.InitialiseUi();
+            var terminalUiService = _serviceProvider!.GetService<TerminalUiService>();
+            terminalUiService!.InitialiseUi();
         }
         catch (Exception exc)
         {

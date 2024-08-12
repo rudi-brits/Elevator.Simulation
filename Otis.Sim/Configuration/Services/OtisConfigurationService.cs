@@ -27,7 +27,7 @@ public class OtisConfigurationService
     /// LoadConfiguration
     /// </summary>
     /// <exception cref="ArgumentException"></exception>
-    public void LoadConfiguration()
+    public virtual void LoadConfiguration()
     {
         string jsonConfiguration = ReadAppSettings();
         var serializerOptions    = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
