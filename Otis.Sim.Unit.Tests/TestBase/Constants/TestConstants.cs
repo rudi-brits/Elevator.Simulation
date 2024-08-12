@@ -63,6 +63,12 @@ public abstract class TestConstants
     /// </summary>
     public const string HasAnEmptyValue = "has an empty value";
 
+    /// <summary>
+    /// NewLineMessageLengthError
+    /// </summary>
+    /// <param name="expectedLength"></param>
+    /// <param name="actualLength"></param>
+    /// <returns>The string result</returns>
     public static string NewLineMessageLengthError(int expectedLength, int actualLength)
         => $"Expected {expectedLength} new line messages, received {actualLength}";
 }

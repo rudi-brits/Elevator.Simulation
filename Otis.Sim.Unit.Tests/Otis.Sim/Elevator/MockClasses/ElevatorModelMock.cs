@@ -202,6 +202,11 @@ public class ElevatorModelMock : ElevatorModel
         return CanAcceptRequestReturnValue;
     }
 
+    /// <summary>
+    /// AcceptRequest
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public override bool AcceptRequest(ElevatorRequest request)
     {
         CalledAcceptRequest = true;
