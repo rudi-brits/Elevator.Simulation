@@ -208,6 +208,7 @@ public class TerminalUiServiceTests : InterfaceTests
 
         _mockTerminalUiService.CallBaseElevatorRows = false;
         _mockTerminalUiService.CallBaseUpdateDataTable = true;
+
         methodInfo.Invoke(_mockTerminalUiService, null);
 
         var tableRowCount = GetElevatorsTableViewRowCount(elevatorsTableView);
@@ -314,7 +315,7 @@ public class TerminalUiServiceTests : InterfaceTests
         var methodInfo = GetNonPublicInstanceMethod<TerminalUiService>("InitialiseTableDataRefresh");
         Assert.That(methodInfo, Is.Not.Null);
 
-        _mockTerminalUiService.CallBaseUpdateDataTable = true;
+        _mockTerminalUiService.CallBaseUpdateDataTable            = false;
         _mockTerminalUiService.CallBaseInitialiseTableDataRefresh = true;
 
         methodInfo.Invoke(_mockTerminalUiService, null);

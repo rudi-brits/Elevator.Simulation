@@ -339,9 +339,16 @@ public class TerminalUiService : ConsoleFullScreenService
     /// </summary>
     protected virtual void UpdateDataTable()
     {
-        _elevatorsTableView!.Table.Rows.Clear();
-        AddElevatorRows();
-        _elevatorsTableView.SetNeedsDisplay();
+        try
+        {
+            _elevatorsTableView!.Table.Rows.Clear();
+            AddElevatorRows();
+            _elevatorsTableView.SetNeedsDisplay();
+        }
+        catch(Exception exc)
+        {
+
+        }
     }
 
     /// <summary>

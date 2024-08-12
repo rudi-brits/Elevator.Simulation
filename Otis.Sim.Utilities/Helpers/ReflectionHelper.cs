@@ -13,9 +13,7 @@ public static class ReflectionHelper
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public static List<string> GetFormattedPropertyNames<T>()
-    {
-        return typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        => typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Select(p => StringHelper.SplitCamelCase(p.Name))
             .ToList();
-    }
 }
