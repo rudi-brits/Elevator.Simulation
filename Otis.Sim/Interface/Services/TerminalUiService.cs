@@ -20,9 +20,17 @@ public class TerminalUiService : ConsoleFullScreenService
     /// </summary>
     private ColorScheme? _globalColorScheme { get; set; }
     /// <summary>
-    /// _idleColorScheme
+    /// _movingUpColorSchema
     /// </summary>
-    private ColorScheme? _idleColorScheme { get; set; }
+    private ColorScheme? _movingUpColorSchema { get; set; }
+    /// <summary>
+    /// _movingDownColorSchema
+    /// </summary>
+    private ColorScheme? _movingDownColorSchema { get; set; }
+    /// <summary>
+    /// _doorsOpenColorScheme
+    /// </summary>
+    private ColorScheme? _doorsOpenColorScheme { get; set; }
     /// <summary>
     /// _requestStatusView
     /// </summary>
@@ -95,12 +103,28 @@ public class TerminalUiService : ConsoleFullScreenService
             Normal = UiConstants.GlobalColorAttribute
         };
 
-        _idleColorScheme = new ColorScheme()
+        _movingUpColorSchema = new ColorScheme()
         {
-            Normal    = UiConstants.IdleColorAttribute,
-            Focus     = UiConstants.IdleColorAttribute,
-            HotNormal = UiConstants.IdleColorAttribute,
-            HotFocus  = UiConstants.IdleColorAttribute,
+            Normal    = UiConstants.MovingUpColorAttribute,
+            Focus     = UiConstants.MovingUpColorAttribute,
+            HotNormal = UiConstants.MovingUpColorAttribute,
+            HotFocus  = UiConstants.MovingUpColorAttribute,
+        };
+
+        _movingDownColorSchema = new ColorScheme()
+        {
+            Normal    = UiConstants.MovingDownColorAttribute,
+            Focus     = UiConstants.MovingDownColorAttribute,
+            HotNormal = UiConstants.MovingDownColorAttribute,
+            HotFocus  = UiConstants.MovingDownColorAttribute,
+        };
+
+        _doorsOpenColorScheme = new ColorScheme()
+        {
+            Normal    = UiConstants.DoorsOpenColorAttribute,
+            Focus     = UiConstants.DoorsOpenColorAttribute,
+            HotNormal = UiConstants.DoorsOpenColorAttribute,
+            HotFocus  = UiConstants.DoorsOpenColorAttribute,
         };
     }
 
@@ -309,7 +333,7 @@ public class TerminalUiService : ConsoleFullScreenService
     protected virtual void CreateElevatorTable()
     {
         _elevatorsTableView!.Table = new DataTable();
-        _elevatorControllerService.ElevatorTableHeaders.ForEach(tableHeader =>
+        ElevatorControllerService.ElevatorTableHeaders.ForEach(tableHeader =>
         {
             _elevatorsTableView.Table.Columns.Add(tableHeader);
         });
@@ -320,10 +344,15 @@ public class TerminalUiService : ConsoleFullScreenService
 
         _elevatorsTableView.Style.RowColorGetter = (args) => {
             var direction = _elevatorsTableView.Table.Rows[args.RowIndex][statusFieldName].ToString();
-            if (direction == ElevatorStatus.Idle.ToString())
-            {
-                return _idleColorScheme;
-            }
+            if (direction == ElevatorStatus.MovingUp.ToString())
+                return _movingUpColorSchema;
+
+            if (direction == ElevatorStatus.MovingDown.ToString())
+                return _movingDownColorSchema;
+
+            if (direction == ElevatorStatus.DoorsOpen.ToString())
+                return _doorsOpenColorScheme;
+
             return _globalColorScheme;
         };
 

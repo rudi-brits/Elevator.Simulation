@@ -13,7 +13,15 @@ public class TerminalUiConstants
     /// </summary>
     public static Attribute GlobalColorAttribute = Attribute.Make(Color.White, Color.Black);
     /// <summary>
-    /// The IdleColorAttribute used to display an idle state.
+    /// The IdleColorAttribute used to display a doors open state.
     /// </summary>
-    public static Attribute IdleColorAttribute   = Attribute.Make(Color.BrightCyan, Color.Black);
+    public static Attribute DoorsOpenColorAttribute = Attribute.Make(Color.BrightRed, Color.Black);
+    /// <summary>
+    /// The MovingUpColorAttribute used to display a moving up state.
+    /// </summary>
+    public static Attribute MovingUpColorAttribute = Attribute.Make(Color.BrightCyan, Color.Black);
+    /// <summary>
+    /// The MovingUpColorAttribute used to display a moving down state.
+    /// </summary>
+    public static Attribute MovingDownColorAttribute = Attribute.Make(Color.BrightYellow, Color.Black);
 }

@@ -17,7 +17,7 @@ public class ElevatorControllerService : ElevatorConfigurationService
     /// <summary>
     /// ElevatorTableHeaders
     /// </summary>
-    public List<string> ElevatorTableHeaders => ReflectionHelper.GetFormattedPropertyNames<ElevatorDataRow>();
+    public static List<string> ElevatorTableHeaders => ReflectionHelper.GetFormattedPropertyNames<ElevatorDataRow>();
     /// <summary>
     /// ElevatorDataRows
     /// </summary>

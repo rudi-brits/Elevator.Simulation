@@ -370,7 +370,7 @@ public class TerminalUiServiceTests : InterfaceTests
         var tableColumns = elevatorsTableViewValue?.Table?.Columns;
 
         Assert.That(tableColumns, Is.Not.Null);
-        Assert.That(tableColumns?.Count, Is.EqualTo(_mockElevatorControllerService.Object.ElevatorTableHeaders.Count));
+        Assert.That(tableColumns?.Count, Is.EqualTo(ElevatorControllerService.ElevatorTableHeaders.Count));
 
         return elevatorsTableView;
     }

@@ -100,11 +100,11 @@ public class ElevatorControllerServiceTests : ElevatorTests
     public void Constructor_WithExpected_InitialisationsAndDefaults()
     {
         // ElevatorTableHeaders 
-        Assert.That(_elevatorControllerServiceMock.ElevatorTableHeaders, Is.Not.Null.Or.Empty);
+        Assert.That(ElevatorControllerService.ElevatorTableHeaders, Is.Not.Null.Or.Empty);
 
         var elevatorDataRowPropertyNames = GetPublicPropertyNames<ElevatorDataRow>();
         Assert.That(elevatorDataRowPropertyNames.Count,
-            Is.EqualTo(_elevatorControllerServiceMock.ElevatorTableHeaders.Count));
+            Is.EqualTo(ElevatorControllerService.ElevatorTableHeaders.Count));
 
         // ElevatorDataRows
         var elevatorsField = GetElevatorsField();

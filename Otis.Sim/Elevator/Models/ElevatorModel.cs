@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Otis.Sim.Configuration.Models;
 using Otis.Sim.Utilities.Extensions;
-using System.Diagnostics;
 using static Otis.Sim.Elevator.Enums.ElevatorEnum;
 
 namespace Otis.Sim.Elevator.Models;
@@ -246,9 +245,6 @@ public class ElevatorModel : ElevatorConfigurationBase
     /// <returns>The bool result</returns>
     protected virtual bool IsFloorAndDirectionValid(int originFloor, ElevatorDirection direction)
     {
-        Debug.WriteLine($"currentFloor: {CurrentFloor}, originFloor: {originFloor}, direction: {direction}, " +
-            "lastFloor: {LastFloor}");
-
         if (Capacity == 0)
             return false;
 
